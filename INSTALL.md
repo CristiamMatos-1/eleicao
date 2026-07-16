@@ -40,7 +40,7 @@ Depois, abra PR no GitHub para versionar oficialmente o schema.
 ```php
 'app' => [
     'base_path' => dirname(__DIR__, 2),
-    'base_url' => '/voto', // use '' se estiver na raiz
+    'base_url' => '/eleicao', // use '' se estiver na raiz do domínio
     'env' => 'prod',
     'session_name' => 'ELECTSESSID',
 ],
@@ -54,10 +54,11 @@ Depois, abra PR no GitHub para versionar oficialmente o schema.
 ],
 ```
 
-8. Garanta as pastas `storage/sessions` e `storage/uploads` com permissão `0755` (ou `0777` se o host exigir).
-9. Mantenha `storage/.htaccess` com `Require all denied`.
-10. Acesse `https://seu-dominio.com/voto/gerar_admin.php` para criar o primeiro admin.
-11. **Apague imediatamente** `public/gerar_admin.php` após criar o usuário.
+8. Garanta que os arquivos `.htaccess` enviados no projeto não foram removidos pelo cPanel.
+9. Garanta as pastas `storage/sessions` e `storage/uploads` com permissão `0755` (ou `0777` se o host exigir).
+10. Mantenha `storage/.htaccess` com `Require all denied`.
+11. Acesse `https://seu-dominio.com/eleicao/gerar_admin.php` para criar o primeiro admin.
+12. **Apague imediatamente** `public/gerar_admin.php` após criar o usuário.
 
 ---
 
