@@ -8,6 +8,15 @@
   <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.css">
 </head>
 <body>
+  <?php
+    $navTitle = 'Painel Administrativo';
+    $navLinks = [
+      ['label' => 'Início', 'href' => $baseUrl . '/admin'],
+      ['label' => 'Voltar', 'href' => $baseUrl . '/admin'],
+    ];
+    $navActions = '';
+    require $this->services['config']['app']['base_path'] . '/app/Views/partials/top_nav.php';
+  ?>
   <main class="wrap">
     <section class="card">
       <div class="row">
@@ -260,5 +269,6 @@
 
     </section>
   </main>
+  <script src="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.js"></script>
 </body>
 </html>

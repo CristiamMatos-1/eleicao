@@ -8,9 +8,20 @@
   <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.css">
 </head>
 <body>
-  <main class="wrap">
-    <section class="card">
+  <?php
+    $navTitle = 'Coninfoms Eleição';
+    $navLinks = [
+      ['label' => 'Login Eleitor', 'href' => $baseUrl . '/login'],
+      ['label' => 'Admin', 'href' => $baseUrl . '/admin/login'],
+    ];
+    $navActions = '';
+    require $this->services['config']['app']['base_path'] . '/app/Views/partials/top_nav.php';
+  ?>
+
+  <main class="wrap auth-wrap">
+    <section class="card auth-card">
       <h1>Registro de Eleitor</h1>
+      <p class="muted">Preencha seus dados para aprovação no processo eleitoral da sua igreja.</p>
       
       <?php if (!$isOpen): ?>
         <div class="box">
@@ -34,7 +45,7 @@
           <input name="name" required maxlength="160" placeholder="Digite seu nome completo">
           
           <label>CPF</label>
-          <input name="cpf" id="cpfInput" inputmode="numeric" autocomplete="off" required maxlength="14" placeholder="Somente números">
+          <input name="cpf" id="cpfInput" inputmode="numeric" autocomplete="off" required maxlength="14" placeholder="000.000.000-00" data-cpf-input>
           
           <button type="submit">Cadastrar</button>
         </form>
@@ -68,5 +79,6 @@
       <?php endif; ?>
     </section>
   </main>
+  <script src="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.js"></script>
 </body>
 </html>

@@ -10,6 +10,41 @@ use App\Domain\Services\ScrutinyCloseService;
 
 $config = require __DIR__ . '/Config/config.php';
 
+$resolveBaseUrl = static function (array $config): string {
+    $configured = trim((string)($config['app']['base_url'] ?? ''));
+    if ($configured !== '' && $configured !== '/') {
+        $configured = '/' . trim($configured, '/');
+    } else {
+        $configured = '';
+    }
+
+    $scriptName = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? ''));
+    $scriptDir = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+    if ($scriptDir === '.' || $scriptDir === '/') {
+        $scriptDir = '';
+    }
+    if ($scriptDir !== '' && str_ends_with($scriptDir, '/public')) {
+        $scriptDir = substr($scriptDir, 0, -7);
+    }
+
+    $requestUri = (string)($_SERVER['REQUEST_URI'] ?? '');
+    $isWeb = $requestUri !== '' || $scriptName !== '';
+
+    if (!$isWeb) {
+        return $configured;
+    }
+
+    if ($configured !== '') {
+        if ($requestUri === '' || str_starts_with($requestUri, $configured . '/') || $requestUri === $configured) {
+            return $configured;
+        }
+    }
+
+    return $scriptDir;
+};
+
+$config['app']['base_url'] = $resolveBaseUrl($config);
+
 spl_autoload_register(function (string $class): void {
     $prefix = 'App\\';
     if (!str_starts_with($class, $prefix)) {

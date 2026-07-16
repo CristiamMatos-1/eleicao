@@ -1,9 +1,5 @@
 <?php
-// Tenta buscar a baseUrl injetada via App.php, caso contrário faz fallback dinâmico seguro
 $baseUrl = rtrim((string)($this->services['config']['app']['base_url'] ?? ''), '/');
-if (empty($baseUrl)) {
-    $baseUrl = '/voto'; // fallback caso seja chamado de forma muito isolada
-}
 ?>
 <!doctype html>
 <html lang="pt-br">
