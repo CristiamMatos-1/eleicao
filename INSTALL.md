@@ -34,13 +34,13 @@ Depois, abra PR no GitHub para versionar oficialmente o schema.
 3. Associe o usuário ao banco com **ALL PRIVILEGES**.
 4. Abra **phpMyAdmin**, selecione o banco e use **Importar**.
 5. Importe o arquivo **`database.sql`**.
-6. No **File Manager**, envie o projeto para `public_html/voto` (ou pasta desejada).
+6. No **File Manager**, envie o projeto para `public_html/eleicao` (ou pasta desejada).
 7. Edite `app/Config/config.php`:
 
 ```php
 'app' => [
     'base_path' => dirname(__DIR__, 2),
-    'base_url' => '/eleicao', // use '' se estiver na raiz do domínio
+    'base_url' => '', // recomendado: autodetecta subpasta no cPanel
     'env' => 'prod',
     'session_name' => 'ELECTSESSID',
 ],

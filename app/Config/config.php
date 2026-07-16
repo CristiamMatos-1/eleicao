@@ -5,8 +5,9 @@ declare(strict_types=1);
 $config = [
     'app' => [
         'base_path' => dirname(__DIR__, 2),
-        // IMPORTANTE: Como você colocou os arquivos dentro da pasta 'voto', mude aqui para '/voto'
-        'base_url' => '/voto',
+        // Deixe vazio para autodetectar (recomendado em cPanel/subpastas).
+        // Exemplo manual: '/eleicao'
+        'base_url' => '',
         'env' => 'prod',
         'session_name' => 'ELECTSESSID',
     ],

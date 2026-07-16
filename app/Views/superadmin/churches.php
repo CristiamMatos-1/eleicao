@@ -1,7 +1,4 @@
-<?php
-$config = require __DIR__ . '/../../Config/config.php';
-$baseUrl = rtrim((string)($config['app']['base_url'] ?? ''), '/');
-?>
+<?php $baseUrl = rtrim((string)($this->services['config']['app']['base_url'] ?? ''), '/'); ?>
 <!doctype html>
 <html lang="pt-br">
 <head>
@@ -14,8 +11,18 @@ $baseUrl = rtrim((string)($config['app']['base_url'] ?? ''), '/');
   </style>
 </head>
 <body>
+  <?php
+    $navTitle = 'Super Admin';
+    $navLinks = [
+      ['label' => 'Igrejas', 'href' => $baseUrl . '/superadmin/churches'],
+      ['label' => 'Configurações', 'href' => $baseUrl . '/superadmin/settings'],
+      ['label' => 'Admin', 'href' => $baseUrl . '/admin'],
+    ];
+    $navActions = '';
+    require $this->services['config']['app']['base_path'] . '/app/Views/partials/top_nav.php';
+  ?>
 <div class="wrap">
-  <main class="main">
+  <main>
     <section class="card">
       <h2>Gerenciar Igrejas (Super Admin)</h2>
       
@@ -98,5 +105,6 @@ $baseUrl = rtrim((string)($config['app']['base_url'] ?? ''), '/');
     </section>
   </main>
 </div>
+<script src="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.js"></script>
 </body>
 </html>

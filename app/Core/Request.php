@@ -59,6 +59,11 @@ final class Request
             }
         }
 
+        // Run again after prefix normalization for URLs like /subfolder/public/index.php/login
+        $path = preg_replace('#^/public/index\.php#', '', $path) ?? $path;
+        $path = preg_replace('#^/index\.php#', '', $path) ?? $path;
+        $path = preg_replace('#^/public#', '', $path) ?? $path;
+
         if ($path === '' || $path === '/') {
             return '/';
         }

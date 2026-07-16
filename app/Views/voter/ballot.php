@@ -8,6 +8,22 @@
   <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.css">
 </head>
 <body>
+  <?php
+    $navTitle = 'Área do Eleitor';
+    $navLinks = [
+      ['label' => 'Cédula', 'href' => $baseUrl . '/votar'],
+      ['label' => 'Apuração', 'href' => $baseUrl . '/dashboard.php'],
+    ];
+    ob_start();
+  ?>
+  <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/logout">
+    <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
+    <button type="submit" class="secondary">Sair</button>
+  </form>
+  <?php
+    $navActions = (string)ob_get_clean();
+    require $this->services['config']['app']['base_path'] . '/app/Views/partials/top_nav.php';
+  ?>
   <main class="wrap">
     <section class="card">
       <div class="row">
@@ -117,5 +133,6 @@
       <a class="link" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/dashboard.php?key=">Painel público (cole a chave)</a>
     </section>
   </main>
+  <script src="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.js"></script>
 </body>
 </html>
