@@ -20,31 +20,50 @@ final class Request
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
         $qPos = strpos($uri, '?');
         $path = $qPos === false ? $uri : substr($uri, 0, $qPos);
-        
-        $base = rtrim($this->baseUrl, '/');
-        if ($base !== '' && str_starts_with($path, $base)) {
-            $path = substr($path, strlen($base));
-        }
 
         $path = '/' . ltrim($path, '/');
-        $path = str_replace('/public/index.php', '', $path);
-        $path = str_replace('/public', '', $path);
-        
-        // Remove document root folder names that cPanel might inject in the URI
-        // Example: if folder is public_html/voto or public_html/cristiammatos
-        $path = preg_replace('#^/cristiammatos\.teo\.br#', '', $path);
-        $path = preg_replace('#^/voto#', '', $path);
-        $path = preg_replace('#^/ipccgv2#', '', $path);
-        
+
+        // Remove front-controller segments when present in the URI.
+        $path = preg_replace('#^/index\.php#', '', $path) ?? $path;
+        $path = preg_replace('#^/public/index\.php#', '', $path) ?? $path;
+        $path = preg_replace('#^/public#', '', $path) ?? $path;
+
+        // Resolve base prefixes from config and server runtime (cPanel subfolder setups).
+        $prefixes = [];
+        $cfgBase = rtrim($this->baseUrl, '/');
+        if ($cfgBase !== '') {
+            $prefixes[] = $cfgBase;
+        }
+
+        $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+        if ($scriptDir !== '' && $scriptDir !== '.') {
+            $prefixes[] = $scriptDir;
+        }
+
+        $phpSelfDir = rtrim(str_replace('\\', '/', dirname($_SERVER['PHP_SELF'] ?? '')), '/');
+        if ($phpSelfDir !== '' && $phpSelfDir !== '.') {
+            $prefixes[] = $phpSelfDir;
+        }
+
+        foreach (array_unique($prefixes) as $prefix) {
+            if ($prefix === '' || $prefix === '/') {
+                continue;
+            }
+            if ($path === $prefix) {
+                $path = '/';
+                break;
+            }
+            if (str_starts_with($path, $prefix . '/')) {
+                $path = substr($path, strlen($prefix));
+                break;
+            }
+        }
+
         if ($path === '' || $path === '/') {
             return '/';
         }
 
-        // Always ensure a leading slash for matching routes
-        $path = '/' . ltrim($path, '/');
-
-        // Keep the trailing slash if it exists so we can match it exactly or redirect it
-        return $path;
+        return '/' . ltrim($path, '/');
     }
 
     public function query(string $key, mixed $default = null): mixed
