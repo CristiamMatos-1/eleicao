@@ -35,7 +35,13 @@ Depois, abra PR no GitHub para versionar oficialmente o schema.
 4. Abra **phpMyAdmin**, selecione o banco e use **Importar**.
 5. Importe o arquivo **`database.sql`**.
 6. No **File Manager**, envie o projeto para `public_html/eleicao` (ou pasta desejada).
-7. Edite `app/Config/config.php`:
+7. Crie o arquivo de configuração real:
+
+```bash
+cp app/Config/config.example.php app/Config/config.php
+```
+
+8. Edite `app/Config/config.php`:
 
 ```php
 'app' => [
@@ -54,11 +60,11 @@ Depois, abra PR no GitHub para versionar oficialmente o schema.
 ],
 ```
 
-8. Garanta que os arquivos `.htaccess` enviados no projeto não foram removidos pelo cPanel.
-9. Garanta as pastas `storage/sessions` e `storage/uploads` com permissão `0755` (ou `0777` se o host exigir).
-10. Mantenha `storage/.htaccess` com `Require all denied`.
-11. Acesse `https://seu-dominio.com/eleicao/gerar_admin.php` para criar o primeiro admin.
-12. **Apague imediatamente** `public/gerar_admin.php` após criar o usuário.
+9. Garanta que os arquivos `.htaccess` enviados no projeto não foram removidos pelo cPanel.
+10. Garanta as pastas `storage/sessions` e `storage/uploads` com permissão `0755` (ou `0777` se o host exigir).
+11. Mantenha `storage/.htaccess` com `Require all denied`.
+12. Acesse `https://seu-dominio.com/eleicao/gerar_admin.php` para criar o primeiro admin.
+13. **Apague imediatamente** `public/gerar_admin.php` após criar o usuário.
 
 ---
 
