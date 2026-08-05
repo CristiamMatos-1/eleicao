@@ -12,6 +12,7 @@
     $navTitle = 'Painel Administrativo';
     $navLinks = [
       ['label' => 'Início', 'href' => $baseUrl . '/admin'],
+      ['label' => 'Minha conta', 'href' => $baseUrl . '/admin/profile'],
       ['label' => 'Nova eleição', 'href' => $baseUrl . '/admin/elections/new'],
     ];
     if (($_SESSION[\App\Core\Auth::SESS_ROLE] ?? '') === 'SUPER_ADMIN') {

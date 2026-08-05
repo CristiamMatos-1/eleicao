@@ -198,4 +198,65 @@ final class AdminController extends Controller
         
         $this->response->redirect('/admin');
     }
+
+    public function profile(): void
+    {
+        $this->services['auth']->requireRole(['ADMIN','CONDUTOR','SUPER_ADMIN']);
+
+        $userId = (int)$this->services['auth']->userId();
+        $pdo = $this->services['pdo'];
+        $stmt = $pdo->prepare("SELECT id, name, email, role, church_id FROM users WHERE id = :id LIMIT 1");
+        $stmt->execute([':id' => $userId]);
+        $me = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$me) {
+            throw new \RuntimeException('Usuário não encontrado.');
+        }
+
+        $this->view('admin/profile.php', [
+            'csrf' => $this->services['csrf']->token(),
+            'me' => $me,
+        ]);
+    }
+
+    public function updateProfile(): void
+    {
+        $this->services['auth']->requireRole(['ADMIN','CONDUTOR','SUPER_ADMIN']);
+        $this->services['csrf']->validate($this->request->post('_csrf'));
+
+        $userId = (int)$this->services['auth']->userId();
+        $name = trim((string)$this->request->post('name', ''));
+        $email = trim((string)$this->request->post('email', ''));
+        $password = (string)$this->request->post('password', '');
+
+        if ($name === '' || $email === '') {
+            throw new \RuntimeException('Nome e e-mail são obrigatórios.');
+        }
+
+        $pdo = $this->services['pdo'];
+        $check = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = :email AND id != :id");
+        $check->execute([':email' => $email, ':id' => $userId]);
+        if ((int)$check->fetchColumn() > 0) {
+            throw new \RuntimeException('Este e-mail já está em uso.');
+        }
+
+        if ($this->services['auth']->role() === 'ADMIN' && !$this->services['auth']->canManageChurchAdminPassword((int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0))) {
+            throw new \RuntimeException('Você não tem permissão para alterar este perfil.');
+        }
+
+        if ($password !== '') {
+            $stmt = $pdo->prepare("UPDATE users SET name = :name, email = :email, password_hash = :hash WHERE id = :id");
+            $stmt->execute([
+                ':name' => $name,
+                ':email' => $email,
+                ':hash' => password_hash($password, PASSWORD_DEFAULT),
+                ':id' => $userId,
+            ]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE users SET name = :name, email = :email WHERE id = :id");
+            $stmt->execute([':name' => $name, ':email' => $email, ':id' => $userId]);
+        }
+
+        $this->response->redirect('/admin/profile?updated=1');
+    }
 }

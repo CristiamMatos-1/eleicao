@@ -16,6 +16,7 @@
     $navTitle = 'Super Admin';
     $navLinks = [
       ['label' => 'Igrejas', 'href' => $baseUrl . '/superadmin/churches'],
+      ['label' => 'Minha conta', 'href' => $baseUrl . '/admin/profile'],
       ['label' => 'Configurações', 'href' => $baseUrl . '/superadmin/settings'],
       ['label' => 'Admin', 'href' => $baseUrl . '/admin'],
     ];
