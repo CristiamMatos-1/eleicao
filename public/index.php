@@ -44,6 +44,8 @@ $app->post('/admin/elector/add', fn($req, $res, $svc) => (new AdminController($r
 $app->post('/admin/elector/delete', fn($req, $res, $svc) => (new AdminController($req, $res, $svc))->deleteElector());
 $app->post('/admin/user/add', fn($req, $res, $svc) => (new AdminController($req, $res, $svc))->addSystemUser());
 $app->post('/admin/user/delete', fn($req, $res, $svc) => (new AdminController($req, $res, $svc))->deleteSystemUser());
+$app->get('/admin/profile', fn($req, $res, $svc) => (new AdminController($req, $res, $svc))->profile());
+$app->post('/admin/profile', fn($req, $res, $svc) => (new AdminController($req, $res, $svc))->updateProfile());
 
 $app->get('/admin/elections/new', fn($req, $res, $svc) => (new ElectionController($req, $res, $svc))->newForm());
 $app->post('/admin/elections', fn($req, $res, $svc) => (new ElectionController($req, $res, $svc))->create());
@@ -65,6 +67,7 @@ $app->get('/superadmin/churches', fn($req, $res, $svc) => (new SuperAdminControl
 $app->post('/superadmin/churches/add', fn($req, $res, $svc) => (new SuperAdminController($req, $res, $svc))->addChurch());
 $app->post('/superadmin/churches/edit', fn($req, $res, $svc) => (new SuperAdminController($req, $res, $svc))->editChurch());
 $app->post('/superadmin/churches/delete', fn($req, $res, $svc) => (new SuperAdminController($req, $res, $svc))->deleteChurch());
+$app->post('/superadmin/churches/admin-password', fn($req, $res, $svc) => (new SuperAdminController($req, $res, $svc))->updateChurchAdminPassword());
 
 $app->get('/superadmin/settings', fn($req, $res, $svc) => (new SuperAdminController($req, $res, $svc))->settings());
 $app->post('/superadmin/settings/update', fn($req, $res, $svc) => (new SuperAdminController($req, $res, $svc))->updateSettings());

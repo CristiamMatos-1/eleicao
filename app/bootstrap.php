@@ -8,7 +8,16 @@ use App\Core\Auth;
 use App\Domain\Services\VoteTransactionService;
 use App\Domain\Services\ScrutinyCloseService;
 
-$config = require __DIR__ . '/Config/config.php';
+$configFile = __DIR__ . '/Config/config.php';
+if (!is_file($configFile)) {
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=UTF-8');
+    echo "Configuração ausente: app/Config/config.php\n";
+    echo "Copie app/Config/config.example.php para app/Config/config.php e preencha os dados reais.\n";
+    exit(1);
+}
+
+$config = require $configFile;
 
 $resolveBaseUrl = static function (array $config): string {
     $configured = trim((string)($config['app']['base_url'] ?? ''));

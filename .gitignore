@@ -1,0 +1,11 @@
+# Configuração com credenciais — NUNCA versionar
+app/Config/config.php
+
+# Sessões e uploads gerados em runtime
+storage/sessions/
+storage/uploads/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+*.log

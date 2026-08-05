@@ -15,6 +15,7 @@
     $navTitle = 'Super Admin';
     $navLinks = [
       ['label' => 'Igrejas', 'href' => $baseUrl . '/superadmin/churches'],
+      ['label' => 'Minha conta', 'href' => $baseUrl . '/admin/profile'],
       ['label' => 'Configurações', 'href' => $baseUrl . '/superadmin/settings'],
       ['label' => 'Admin', 'href' => $baseUrl . '/admin'],
     ];
@@ -59,6 +60,13 @@
                 </div>
               </div>
               <div style="display:flex; gap:10px; flex-wrap: wrap;">
+                <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/superadmin/churches/admin-password" class="form" style="display:flex; gap:8px; align-items:end; flex-wrap:wrap;">
+                  <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
+                  <input type="hidden" name="church_id" value="<?= (int)$c['id'] ?>">
+                  <input type="hidden" name="user_id" value="<?= (int)($c['admin_id'] ?? 0) ?>">
+                  <input name="password" type="password" minlength="6" placeholder="Nova senha do admin" style="min-width:220px;">
+                  <button type="submit">Salvar senha</button>
+                </form>
                 <button type="button" onclick="editChurch(<?= (int)$c['id'] ?>, '<?= htmlspecialchars(addslashes($c['name']), ENT_QUOTES, 'UTF-8') ?>')" style="background:var(--warn); color:#000; padding:8px 12px; font-size:14px; border:none; border-radius:8px; cursor:pointer;">Editar</button>
                 <?php if ((int)$c['id'] !== 1): ?>
                   <button type="button" onclick="deleteChurch(<?= (int)$c['id'] ?>)" style="background:var(--danger); color:#fff; padding:8px 12px; font-size:14px; border:none; border-radius:8px; cursor:pointer;">Excluir</button>

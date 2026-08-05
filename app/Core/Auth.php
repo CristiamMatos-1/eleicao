@@ -98,6 +98,16 @@ final class Auth
         $_SESSION[self::SESS_CHURCH_ID] = (int)$row['church_id'];
     }
 
+    public function canManageChurchAdminPassword(int $targetChurchId): bool
+    {
+        $role = $this->role();
+        if ($role === 'SUPER_ADMIN') {
+            return true;
+        }
+
+        return $role === 'ADMIN' && (int)($_SESSION[self::SESS_CHURCH_ID] ?? 0) === $targetChurchId;
+    }
+
     public function requireRole(array $roles): void
     {
         $role = $this->role();

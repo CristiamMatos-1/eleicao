@@ -28,6 +28,42 @@ final class SuperAdminController extends Controller
         ]);
     }
 
+    public function updateChurchAdminPassword(): void
+    {
+        $this->services['auth']->requireRole(['SUPER_ADMIN', 'ADMIN']);
+        $this->services['csrf']->validate($this->request->post('_csrf'));
+
+        $churchId = (int)$this->request->post('church_id', 0);
+        $userId = (int)$this->request->post('user_id', 0);
+        $password = (string)$this->request->post('password', '');
+
+        if ($churchId <= 0 || $userId <= 0 || $password === '') {
+            throw new RuntimeException('Dados inválidos para atualização de senha.');
+        }
+
+        if (!$this->services['auth']->canManageChurchAdminPassword($churchId)) {
+            throw new RuntimeException('Você não tem permissão para alterar esta senha.');
+        }
+
+        $pdo = $this->services['pdo'];
+        $stmt = $pdo->prepare(
+            "UPDATE users
+             SET password_hash = :hash
+             WHERE id = :id AND church_id = :church_id AND role = 'ADMIN'"
+        );
+        $stmt->execute([
+            ':hash' => password_hash($password, PASSWORD_DEFAULT),
+            ':id' => $userId,
+            ':church_id' => $churchId,
+        ]);
+
+        if ($stmt->rowCount() === 0) {
+            throw new RuntimeException('Administrador não encontrado para esta igreja.');
+        }
+
+        $this->response->redirect('/superadmin/churches?password_updated=1');
+    }
+
     public function addChurch(): void
     {
         $this->services['auth']->requireRole(['SUPER_ADMIN']);
