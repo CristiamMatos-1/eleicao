@@ -7,6 +7,8 @@ use App\Core\Csrf;
 use App\Core\Auth;
 use App\Domain\Services\VoteTransactionService;
 use App\Domain\Services\ScrutinyCloseService;
+use App\Domain\Services\AttendanceService;
+use App\Domain\Services\AttendancePdfService;
 
 $config = require __DIR__ . '/Config/config.php';
 
@@ -99,6 +101,8 @@ $services = [
     'auth' => $auth,
     'vote_tx' => new VoteTransactionService($pdo, $cpfPepper),
     'scrutiny_close' => new ScrutinyCloseService($pdo),
+    'attendance' => new AttendanceService($pdo),
+    'attendance_pdf' => new AttendancePdfService($pdo),
     'config' => $config,
 ];
 

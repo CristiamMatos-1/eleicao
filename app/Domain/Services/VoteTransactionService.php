@@ -96,6 +96,8 @@ final class VoteTransactionService
         try {
             $scrutiny = $this->lockOpenScrutiny($electionId, $scrutinyId);
 
+            $this->enforcePresenceRequired($electionId, $cpfDigits);
+
             $cpfHash = $this->computeCpfHash($cpfDigits, $scrutiny['cpf_salt']);
 
             $ballotToken = bin2hex(random_bytes(16));
@@ -121,6 +123,25 @@ final class VoteTransactionService
         } catch (Throwable $e) {
             $this->pdo->rollBack();
             throw $e;
+        }
+    }
+
+    private function enforcePresenceRequired(int $electionId, string $cpfDigits): void
+    {
+        try {
+            $stmt = $this->pdo->prepare(
+                "SELECT 1 FROM eleicao_presencas
+                 WHERE eleicao_id = :eid AND cpf = :cpf
+                 LIMIT 1"
+            );
+            $stmt->execute([':eid' => $electionId, ':cpf' => $cpfDigits]);
+            $has = (bool)$stmt->fetchColumn();
+        } catch (Throwable) {
+            $has = true;
+        }
+
+        if (!$has) {
+            throw new RuntimeException('Presença não registrada nesta assembleia.');
         }
     }
 

@@ -25,28 +25,62 @@
       </div>
 
       <div class="box">
-        <div class="row">
+        <div class="row" style="align-items:flex-start; flex-wrap:wrap; gap:16px;">
           <div>
-            <div class="muted">Status</div>
-            <div class="big"><?= htmlspecialchars($election['status'], ENT_QUOTES, 'UTF-8') ?></div>
+            <div class="muted">Status do Workflow</div>
+            <?php
+              $status = (string)($election['status'] ?? '');
+              $statusMap = [
+                'aberta_para_presenca' => ['Aberta para Presença', 'background:#FFF3CD; color:#856404;'],
+                'aberta_para_votacao'  => ['Aberta para Votação', 'background:#D4EDDA; color:#155724;'],
+                'encerrada'            => ['Encerrada',          'background:#F8D7DA; color:#721C24;'],
+                'OPEN'                 => ['Aberta (Legado)',     'background:#D1ECF1; color:#0C5460;'],
+                'CLOSED'               => ['Encerrada (Legado)',  'background:#F8D7DA; color:#721C24;'],
+              ];
+              [$statusLabel, $statusStyle] = $statusMap[$status] ?? ['Status desconhecido', ''];
+            ?>
+            <div class="big" style="<?= $statusStyle ?> display:inline-block; padding:6px 12px; border-radius:999px; margin-top:4px;">
+              <?= htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8') ?>
+            </div>
           </div>
-          <?php if ($election['status'] === 'OPEN'): ?>
-            <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/close" onsubmit="return confirm('Tem certeza que deseja encerrar esta eleição prematuramente?');">
-              <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
-              <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
-              <button type="submit" class="secondary" style="color:var(--danger); border-color:rgba(255,77,79,0.3);">Encerrar Eleição</button>
-            </form>
-          <?php endif; ?>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <?php if ($status !== 'encerrada' && $status !== 'CLOSED'): ?>
+              <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/workflow/status" onsubmit="return confirm('Deseja abrir a fase de presença?');" style="display:inline;">
+                <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
+                <input type="hidden" name="status" value="presenca">
+                <button type="submit" class="secondary" style="white-space:nowrap;">Abrir para Presença</button>
+              </form>
+              <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/workflow/status" onsubmit="return confirm('Deseja abrir a votação agora?');" style="display:inline;">
+                <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
+                <input type="hidden" name="status" value="votacao">
+                <button type="submit" class="secondary" style="white-space:nowrap;">Abrir para Votação</button>
+              </form>
+              <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/workflow/status" onsubmit="return confirm('Tem certeza que deseja encerrar esta eleição? Após encerrada, presenças e votos não podem ser mais inseridos.');" style="display:inline;">
+                <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
+                <input type="hidden" name="status" value="encerrada">
+                <button type="submit" class="secondary" style="color:var(--danger); border-color:rgba(255,77,79,0.3); white-space:nowrap;">Encerrar Eleição</button>
+              </form>
+            <?php endif; ?>
+          </div>
         </div>
 
-        <div class="muted" style="margin-top:10px">Painel público</div>
+        <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+          <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" class="secondary" style="display:inline-block; text-decoration:none; padding:10px 14px; border:1px solid var(--accent); border-radius:8px; color:var(--accent); font-weight:bold;">Lista de Presença</a>
+          <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance/pdf?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" class="secondary" style="display:inline-block; text-decoration:none; padding:10px 14px; border:1px solid var(--border); border-radius:8px;">Exportar / Imprimir PDF</a>
+        </div>
+
+        <div class="muted" style="margin-top:14px">Painel público</div>
         <div class="row">
           <div class="big" style="font-size:14px;word-break:break-all">
             <?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/dashboard.php?key=<?= htmlspecialchars($election['public_key'], ENT_QUOTES, 'UTF-8') ?>
           </div>
         </div>
         
-        <?php if ($election['status'] === 'OPEN'): ?>
+        <?php if (in_array($status, ['OPEN','aberta_para_presenca','aberta_para_votacao'], true)): ?>
           <hr style="border:0; border-top:1px solid var(--border); margin:15px 0;">
           <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/config/edit" class="form">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
@@ -89,8 +123,9 @@
                 </ul>
               <?php endif; ?>
             </div>
-            <div style="margin-top:10px;">
-              <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/attendance?id=<?= (int)$election['id'] ?>" target="_blank" class="secondary" style="display:inline-block; text-decoration:none; padding:8px 12px; border:1px solid var(--accent); border-radius:8px; color:var(--accent); font-weight:bold; font-size:13px;">Imprimir Lista de Presença</a>
+            <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+              <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" class="secondary" style="display:inline-block; text-decoration:none; padding:8px 12px; border:1px solid var(--accent); border-radius:8px; color:var(--accent); font-weight:bold; font-size:13px;">Lista de Presença</a>
+              <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance/pdf?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" class="secondary" style="display:inline-block; text-decoration:none; padding:8px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px;">Exportar PDF</a>
             </div>
           </div>
 

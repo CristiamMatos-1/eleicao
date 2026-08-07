@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Domain\Services\AttendanceService;
 use PDO;
 use RuntimeException;
 use Throwable;
@@ -407,7 +408,7 @@ final class ElectionController extends Controller
 
     public function attendanceList(): void
     {
-        $this->services['auth']->requireRole(['ADMIN','SUPER_ADMIN']);
+        $this->services['auth']->requireRole(['ADMIN','CONDUTOR','SUPER_ADMIN']);
         $churchId = (int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0);
         $id = (int)$this->request->query('id', 0);
         if ($id <= 0) {
@@ -416,7 +417,7 @@ final class ElectionController extends Controller
 
         $pdo = $this->services['pdo'];
 
-        $eStmt = $pdo->prepare("SELECT id, title, type, election_date FROM elections WHERE id = :id LIMIT 1");
+        $eStmt = $pdo->prepare("SELECT id, title, type, election_date, status FROM elections WHERE id = :id LIMIT 1");
         $eStmt->execute([':id' => $id]);
         $election = $eStmt->fetch(PDO::FETCH_ASSOC);
 
@@ -424,29 +425,144 @@ final class ElectionController extends Controller
             throw new RuntimeException('Eleição não encontrada.');
         }
 
+        /** @var AttendanceService $attSvc */
+        $attSvc = $this->services['attendance'] ?? null;
         $voters = [];
-        if ($election['type'] === 'DIRETORIA') {
+        $presentCount = 0;
+        if ($attSvc !== null) {
             try {
-                $accStmt = $pdo->prepare("
-                    SELECT u.name, u.cpf 
-                    FROM users u 
-                    INNER JOIN election_voters ev ON ev.user_id = u.id AND ev.election_id = :eid 
-                    WHERE u.role = 'ELEITOR' AND u.approved = 1 AND u.active = 1 
-                    ORDER BY u.name ASC
-                ");
-                $accStmt->execute([':eid' => $id]);
-                $voters = $accStmt->fetchAll(PDO::FETCH_ASSOC);
-            } catch (\Throwable $e) {}
-        } else {
-            $vStmt = $pdo->prepare("SELECT name, cpf FROM users WHERE role = 'ELEITOR' AND approved = 1 AND active = 1 AND church_id = :cid ORDER BY name ASC");
-            $vStmt->execute([':cid' => $churchId]);
-            $voters = $vStmt->fetchAll(PDO::FETCH_ASSOC);
+                $voters = $attSvc->listElectorsWithPresenceFlag($churchId, $id);
+                $presentCount = $attSvc->countPresences($id);
+            } catch (\Throwable) {
+                $voters = [];
+            }
+        }
+
+        if ($voters === []) {
+            if ($election['type'] === 'DIRETORIA') {
+                try {
+                    $accStmt = $pdo->prepare("
+                        SELECT u.name, u.cpf 
+                        FROM users u 
+                        INNER JOIN election_voters ev ON ev.user_id = u.id AND ev.election_id = :eid 
+                        WHERE u.role = 'ELEITOR' AND u.approved = 1 AND u.active = 1 
+                        ORDER BY u.name ASC
+                    ");
+                    $accStmt->execute([':eid' => $id]);
+                    $raw = $accStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+                    foreach ($raw as $r) {
+                        $voters[] = [
+                            'name'     => (string)($r['name'] ?? ''),
+                            'cpf'      => AttendanceService::normalizeCpf((string)($r['cpf'] ?? '')),
+                            'presente' => false,
+                            'id'       => 0,
+                        ];
+                    }
+                } catch (\Throwable) {}
+            } else {
+                $vStmt = $pdo->prepare("SELECT name, cpf FROM users WHERE role = 'ELEITOR' AND approved = 1 AND active = 1 AND church_id = :cid ORDER BY name ASC");
+                $vStmt->execute([':cid' => $churchId]);
+                $raw = $vStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+                foreach ($raw as $r) {
+                    $voters[] = [
+                        'name'     => (string)($r['name'] ?? ''),
+                        'cpf'      => AttendanceService::normalizeCpf((string)($r['cpf'] ?? '')),
+                        'presente' => false,
+                        'id'       => 0,
+                    ];
+                }
+            }
         }
 
         $this->view('admin/attendance_list.php', [
-            'election' => $election,
-            'voters' => $voters,
+            'election'       => $election,
+            'voters'         => $voters,
+            'presentCount'   => $presentCount,
+            'csrf'           => $this->services['csrf']->token(),
         ]);
+    }
+
+    public function registerPresence(): void
+    {
+        $this->services['auth']->requireRole(['ADMIN','CONDUTOR','SUPER_ADMIN']);
+        $this->services['csrf']->validate($this->request->post('_csrf'));
+
+        $electionId = (int)$this->request->post('election_id', 0);
+        $cpfRaw     = (string)$this->request->post('cpf', '');
+        $nome       = trim((string)$this->request->post('nome', ''));
+        $userId     = (int)$this->request->post('user_id', 0);
+
+        if ($electionId <= 0) {
+            throw new RuntimeException('Eleição inválida.');
+        }
+
+        $churchId = (int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0);
+
+        /** @var AttendanceService $attSvc */
+        $attSvc = $this->services['attendance'];
+        $attSvc->registerPresence(
+            $churchId,
+            $electionId,
+            $cpfRaw,
+            $nome === '' ? null : $nome,
+            $userId > 0 ? $userId : null
+        );
+
+        $this->response->redirect('/admin/elections/attendance?id=' . $electionId);
+    }
+
+    public function setWorkflowStatus(): void
+    {
+        $this->services['auth']->requireRole(['ADMIN','SUPER_ADMIN']);
+        $this->services['csrf']->validate($this->request->post('_csrf'));
+
+        $electionId = (int)$this->request->post('election_id', 0);
+        $newStatus  = (string)$this->request->post('status', '');
+
+        if ($electionId <= 0) {
+            throw new RuntimeException('Eleição inválida.');
+        }
+
+        $map = [
+            'presenca'  => AttendanceService::STATUS_PRESENCA,
+            'votacao'   => AttendanceService::STATUS_VOTACAO,
+            'encerrada' => AttendanceService::STATUS_ENCERRADA,
+        ];
+
+        if (!isset($map[$newStatus])) {
+            throw new RuntimeException('Status de fluxo inválido.');
+        }
+
+        $churchId = (int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0);
+        /** @var AttendanceService $attSvc */
+        $attSvc = $this->services['attendance'];
+        $attSvc->setStatus($churchId, $electionId, $map[$newStatus]);
+
+        $this->response->redirect('/admin/elections/manage?id=' . $electionId);
+    }
+
+    public function attendanceListPdf(): void
+    {
+        $this->services['auth']->requireRole(['ADMIN','CONDUTOR','SUPER_ADMIN']);
+
+        $id = (int)$this->request->query('id', 0);
+        if ($id <= 0) {
+            throw new RuntimeException('Eleição inválida.');
+        }
+
+        $churchId = (int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0);
+        $pdo = $this->services['pdo'];
+
+        $eStmt = $pdo->prepare("SELECT id, title, type, election_date, status FROM elections WHERE id = :id AND church_id = :cid LIMIT 1");
+        $eStmt->execute([':id' => $id, ':cid' => $churchId]);
+        $election = $eStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$election) {
+            throw new RuntimeException('Eleição não encontrada.');
+        }
+
+        /** @var \App\Domain\Services\AttendancePdfService $pdfSvc */
+        $pdfSvc = $this->services['attendance_pdf'];
+        $pdfSvc->generate($election, $churchId, $id);
     }
 
     public function addCandidate(): void

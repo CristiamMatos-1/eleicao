@@ -33,6 +33,7 @@ $app->post('/admin/login', fn($req, $res, $svc) => (new AuthController($req, $re
 $app->get('/votar', fn($req, $res, $svc) => (new VoteController($req, $res, $svc))->showBallot());
 $app->get('/voto', fn($req, $res, $svc) => $res->redirect('/votar'));
 $app->get('/voto/', fn($req, $res, $svc) => $res->redirect('/votar'));
+$app->post('/votar/presenca', fn($req, $res, $svc) => (new VoteController($req, $res, $svc))->confirmPresence());
 $app->post('/votar/pastor', fn($req, $res, $svc) => (new VoteController($req, $res, $svc))->castPastor());
 $app->post('/votar/oficiais', fn($req, $res, $svc) => (new VoteController($req, $res, $svc))->castOfficers());
 
@@ -58,6 +59,10 @@ $app->post('/admin/elections/config/edit', fn($req, $res, $svc) => (new Election
 $app->post('/admin/elections/accreditation/toggle', fn($req, $res, $svc) => (new ElectionController($req, $res, $svc))->toggleAccreditation());
 
 $app->get('/admin/elections/attendance', fn($req, $res, $svc) => (new ElectionController($req, $res, $svc))->attendanceList());
+$app->get('/admin/elections/attendance/pdf', fn($req, $res, $svc) => (new ElectionController($req, $res, $svc))->attendanceListPdf());
+$app->post('/admin/elections/attendance/register', fn($req, $res, $svc) => (new ElectionController($req, $res, $svc))->registerPresence());
+$app->post('/admin/elections/workflow/status', fn($req, $res, $svc) => (new ElectionController($req, $res, $svc))->setWorkflowStatus());
+
 $app->get('/admin/elections/scrutiny/next', fn($req, $res, $svc) => (new ElectionController($req, $res, $svc))->openNextScrutinyForm());
 $app->post('/admin/elections/scrutiny/next', fn($req, $res, $svc) => (new ElectionController($req, $res, $svc))->openNextScrutiny());
 
