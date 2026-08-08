@@ -69,7 +69,7 @@
               echo htmlspecialchars($initials ?: 'U', ENT_QUOTES, 'UTF-8');
             ?>
           </div>
-          <div style="line-height:1.25;">
+          <div>
             <div style="font-weight:600; color:#fff;"><?= htmlspecialchars((string)$myName, ENT_QUOTES, 'UTF-8') ?></div>
             <div style="font-size:12px; opacity:.85;">CPF: <?= htmlspecialchars((string)($myCpf ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
           </div>
@@ -184,20 +184,20 @@
 
             <div class="muted" style="margin-bottom:12px; font-weight:500; color:var(--brand-text);">Selecione a sua opção:</div>
             <div class="cols-3" style="gap:12px;">
-              <label class="candidate-card" style="cursor:pointer; text-align:center; padding:22px 14px;">
-                <input type="radio" name="choice" value="SIM" required style="position:absolute; opacity:0; pointer-events:none;">
-                <div style="font-size:28px; font-weight:800; color:var(--brand-success); letter-spacing:1px;">SIM</div>
-                <div class="muted" style="margin-top:6px; font-size:13px;">Aprovar o candidato</div>
+              <label class="voto-card voto-card--sim">
+                <input type="radio" name="choice" value="SIM" required>
+                <div class="voto-card__label">SIM</div>
+                <div class="voto-card__hint">Aprovar o candidato</div>
               </label>
-              <label class="candidate-card" style="cursor:pointer; text-align:center; padding:22px 14px;">
-                <input type="radio" name="choice" value="NAO" style="position:absolute; opacity:0; pointer-events:none;">
-                <div style="font-size:28px; font-weight:800; color:var(--brand-danger); letter-spacing:1px;">NÃO</div>
-                <div class="muted" style="margin-top:6px; font-size:13px;">Rejeitar o candidato</div>
+              <label class="voto-card voto-card--nao">
+                <input type="radio" name="choice" value="NAO">
+                <div class="voto-card__label">NÃO</div>
+                <div class="voto-card__hint">Rejeitar o candidato</div>
               </label>
-              <label class="candidate-card" style="cursor:pointer; text-align:center; padding:22px 14px;">
-                <input type="radio" name="choice" value="BRANCO" style="position:absolute; opacity:0; pointer-events:none;">
-                <div style="font-size:28px; font-weight:800; color:var(--brand-muted); letter-spacing:1px;">BRANCO</div>
-                <div class="muted" style="margin-top:6px; font-size:13px;">Não opinar</div>
+              <label class="voto-card voto-card--branco">
+                <input type="radio" name="choice" value="BRANCO">
+                <div class="voto-card__label">BRANCO</div>
+                <div class="voto-card__hint">Não opinar</div>
               </label>
             </div>
 
@@ -235,15 +235,14 @@
               </div>
             <?php endif; ?>
 
-            <div id="officersList" style="display:grid; grid-template-columns:1fr; gap:10px;">
+            <div id="officersList" class="candidates-list candidates-list--2col">
               <?php foreach ($candidates as $c): ?>
-                <label class="candidate-card" style="cursor:pointer; display:flex; align-items:center; gap:14px; padding:14px 16px;">
+                <label class="candidate-card">
                   <input
                     type="checkbox"
                     name="candidate_ids[]"
                     value="<?= (int)$c['id'] ?>"
                     class="candidate-cb"
-                    style="width:22px; height:22px; flex-shrink:0; accent-color:var(--brand-primary);"
                   >
                   <?php if (!empty($c['photo_path'])): ?>
                     <img
@@ -265,12 +264,12 @@
                       ?>
                     </div>
                   <?php endif; ?>
-                  <div style="flex:1; min-width:0;">
-                    <div style="font-weight:600; color:var(--brand-text); font-size:16px; line-height:1.25;">
+                  <div class="candidate-body">
+                    <div class="candidate-row__name" style="font-weight:600; color:var(--brand-text); font-size:1rem; line-height:1.25;">
                       <?= htmlspecialchars($c['full_name'], ENT_QUOTES, 'UTF-8') ?>
                     </div>
                     <?php if (!empty($c['role_title'])): ?>
-                      <div class="muted" style="font-size:13px; margin-top:2px;">
+                      <div class="candidate-meta">
                         <?= htmlspecialchars($c['role_title'], ENT_QUOTES, 'UTF-8') ?>
                       </div>
                     <?php endif; ?>

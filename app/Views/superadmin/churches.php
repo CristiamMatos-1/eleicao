@@ -36,7 +36,7 @@
     </div>
   <?php endif; ?>
 
-  <div class="cols-2" style="margin-bottom:18px;">
+  <div class="cols-2 layout-row">
     <div class="card">
       <div class="card__header">
         <h3 style="margin:0;">Cadastrar Nova Igreja</h3>
@@ -60,8 +60,8 @@
           <input name="admin_password" type="password" required minlength="6" placeholder="Mínimo 6 caracteres">
         </div>
 
-        <div class="form-grid__cell form-grid__cell--2" style="display:flex; align-items:flex-end;">
-          <button type="submit" class="btn btn--primary" style="width:100%;">Cadastrar Igreja e Admin</button>
+        <div class="form-grid__cell form-grid__cell--2 form-grid__cell--submit">
+          <button type="submit" class="btn btn--primary">Cadastrar Igreja e Admin</button>
         </div>
       </form>
     </div>
@@ -81,7 +81,7 @@
       </div>
       <div style="margin-top:18px; padding:14px 16px; border:1px solid var(--brand-border); border-radius:var(--radius-lg); background:var(--brand-surface);">
         <div style="font-weight:600; margin-bottom:4px; color:var(--brand-warn);">Dica</div>
-        <div class="muted" style="font-size:13px;">
+        <div class="hint-muted">
           Cada igreja cadastrada recebe automaticamente seu próprio usuário administrador, isolado dos demais.
         </div>
       </div>
@@ -95,8 +95,9 @@
     </div>
 
     <?php if (empty($churches)): ?>
-      <div style="text-align:center; padding:36px 16px; color:var(--brand-muted);">
-        Nenhuma igreja cadastrada. Use o formulário ao lado para começar.
+      <div class="empty-state">
+        <div class="empty-state__title">Nenhuma igreja cadastrada.</div>
+        <div class="empty-state__subtitle">Use o formulário ao lado para começar.</div>
       </div>
     <?php else: ?>
       <div class="table-wrap">
@@ -113,16 +114,14 @@
           <tbody>
             <?php foreach ($churches as $c): ?>
               <tr>
-                <td style="text-align:center; color:var(--brand-muted); font-variant-numeric: tabular-nums;"><?= (int)$c['id'] ?></td>
-                <td style="font-weight:600;">
-                  <?= htmlspecialchars($c['name'], ENT_QUOTES, 'UTF-8') ?>
+                <td class="cell-muted cell-mono" style="text-align:center;"><?= (int)$c['id'] ?></td>
+                <td>
+                  <div class="cell-name"><?= htmlspecialchars($c['name'], ENT_QUOTES, 'UTF-8') ?></div>
                   <?php if ((int)$c['id'] === 1): ?>
                     <span class="pill pill--amber" style="margin-left:8px; font-size:11px;">Principal</span>
                   <?php endif; ?>
                 </td>
-                <td style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:var(--brand-muted);">
-                  <?= htmlspecialchars($c['slug'], ENT_QUOTES, 'UTF-8') ?>
-                </td>
+                <td class="cell-mono"><?= htmlspecialchars($c['slug'], ENT_QUOTES, 'UTF-8') ?></td>
                 <td>
                   <?php if (!empty($c['admin_email'])): ?>
                     <span style="font-weight:500;"><?= htmlspecialchars($c['admin_email'], ENT_QUOTES, 'UTF-8') ?></span>
@@ -142,8 +141,7 @@
                     <?php if ((int)$c['id'] !== 1): ?>
                       <button
                         type="button"
-                        class="btn btn--sm"
-                        style="background:var(--brand-danger); color:#fff; border-color:var(--brand-danger);"
+                        class="btn btn--danger-outline btn--sm"
                         onclick="deleteChurch(<?= (int)$c['id'] ?>)"
                       >
                         Excluir

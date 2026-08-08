@@ -37,7 +37,7 @@
     <div class="alert alert--success">Novo Super Admin cadastrado com sucesso!</div>
   <?php endif; ?>
 
-  <div class="cols-2" style="margin-bottom:18px;">
+  <div class="cols-2 layout-row">
     <div class="card">
       <div class="card__header">
         <h3 style="margin:0;">Meu Perfil</h3>
@@ -57,12 +57,12 @@
         </div>
 
         <div class="form-grid__cell form-grid__cell--2">
-          <label>Nova Senha <span class="muted" style="font-weight:400;">(deixe em branco para não alterar)</span></label>
+          <label>Nova Senha <span class="hint-inline">(deixe em branco para não alterar)</span></label>
           <input name="password" type="password" minlength="6" placeholder="Digite apenas se quiser alterar a senha">
         </div>
 
-        <div class="form-grid__cell form-grid__cell--2" style="display:flex; align-items:flex-end;">
-          <button type="submit" class="btn btn--primary" style="width:100%;">Salvar Alterações</button>
+        <div class="form-grid__cell form-grid__cell--2 form-grid__cell--submit">
+          <button type="submit" class="btn btn--primary">Salvar Alterações</button>
         </div>
       </form>
     </div>
@@ -90,13 +90,13 @@
           <input name="password" type="password" required minlength="6" placeholder="Defina uma senha segura (mínimo 6 caracteres)">
         </div>
 
-        <div class="form-grid__cell form-grid__cell--2" style="display:flex; align-items:flex-end;">
-          <button type="submit" class="btn btn--primary" style="width:100%;">Cadastrar Super Admin</button>
+        <div class="form-grid__cell form-grid__cell--2 form-grid__cell--submit">
+          <button type="submit" class="btn btn--primary">Cadastrar Super Admin</button>
         </div>
       </form>
 
       <div style="margin-top:18px;">
-        <a class="btn btn--secondary" style="width:100%; text-align:center; justify-content:center;" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/superadmin/churches">
+        <a class="btn btn--secondary btn-block" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/superadmin/churches">
           Voltar ao Gerenciador de Igrejas
         </a>
       </div>

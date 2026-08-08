@@ -35,19 +35,20 @@
 
     <div class="toolbar">
       <div class="page-title">
-        <span class="muted" style="font-size:13px; letter-spacing:.4px;"><a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin" style="color:inherit; text-decoration:none;">Painel</a> · Visão geral</span>
+        <span class="crumbs"><a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin" style="color:inherit; text-decoration:none;">Painel</a> · Visão geral</span>
         <h1>Olá, <?= htmlspecialchars((string)($authUserName !== '' ? $authUserName : 'Admin'), ENT_QUOTES, 'UTF-8') ?></h1>
+        <p class="muted page-subtitle">Controle assembleias, eleitores, usuários e acompanhe apurações</p>
       </div>
       <div class="page-actions">
         <?php if (($authUserRole ?? '') === 'SUPER_ADMIN'): ?>
           <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/superadmin/churches" class="btn btn--secondary btn--sm">Gerenciar Igrejas</a>
         <?php endif; ?>
-        <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/dashboard.php" class="btn btn--secondary btn--sm" target="_blank" rel="noopener noreferrer">Apuração pública ↗</a>
+        <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/dashboard.php" class="btn btn--secondary btn--sm" target="_blank" rel="noopener noreferrer">Apuração pública &nearr;</a>
       </div>
     </div>
 
-    <div class="cols-4" style="margin-bottom:20px;">
-      <div class="kpi">
+    <div class="cols-4 layout-row">
+      <div class="kpi <?= $registration_open ? 'kpi--green' : '' ?>">
         <div class="kpi__label">Cadastros</div>
         <div class="kpi__value"><?= $registration_open ? 'Abertos' : 'Fechados' ?></div>
         <div class="kpi__hint">
@@ -77,25 +78,26 @@
       </div>
     </div>
 
-    <div class="cols-2">
+    <div class="cols-2 layout-row">
 
-      <section class="card" style="display:flex; flex-direction:column; gap:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:14px; flex-wrap:wrap;">
+      <section class="card card-stack">
+        <div class="card__header">
           <div>
-            <h2 style="margin:0; color:var(--brand-secondary);">Cadastros</h2>
-            <span class="muted" style="font-size:13px;">Ajuste o período e gerencie eleitores</span>
+            <h2 class="card__title-sm">Cadastros</h2>
+            <span class="card__hint">Ajuste o período e gerencie eleitores</span>
           </div>
         </div>
-        <div class="card card--tinted" style="padding:16px 18px;">
-          <div style="font-weight:600; margin-bottom:10px;">Período de cadastro de eleitores</div>
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <div>
-              <div class="muted" style="font-size:13px;">Situação atual</div>
-              <div style="margin-top:4px; font-size:17px; font-weight:700;">
-                <?= $registration_open ? '<span style="color:var(--brand-success);">Cadastros abertos</span>' : '<span style="color:var(--brand-muted);">Cadastros fechados</span>' ?>
+
+        <div class="subcard subcard--soft">
+          <h4 class="subcard__title">Período de cadastro de eleitores</h4>
+          <div class="period-row">
+            <div class="period-info">
+              <div class="period-label">Situação atual</div>
+              <div class="period-status <?= $registration_open ? 'is-open' : 'is-closed' ?>">
+                <?= $registration_open ? 'Cadastros abertos' : 'Cadastros fechados' ?>
               </div>
             </div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <div class="period-actions">
               <?php if (!$registration_open): ?>
                 <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/registrations/open" data-confirm="Abrir período de cadastro de eleitores?">
                   <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
@@ -111,20 +113,20 @@
           </div>
         </div>
 
-        <div class="card" style="border:1px solid var(--brand-border); padding:16px 18px; margin-top:4px;">
-          <div style="font-weight:600; margin-bottom:12px;">Adicionar eleitor manualmente</div>
+        <div class="subcard">
+          <h4 class="subcard__title">Adicionar eleitor manualmente</h4>
           <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elector/add">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-grid g-4">
-              <div class="form-grid__cell form-grid__cell--2">
-                <label>Nome Completo</label>
-                <input name="name" required maxlength="160" placeholder="Nome do eleitor">
+              <div class="form-grid__cell form-grid__cell--5">
+                <label for="electorName">Nome Completo</label>
+                <input id="electorName" name="name" required maxlength="160" placeholder="Nome do eleitor">
               </div>
-              <div class="form-grid__cell form-grid__cell--1">
-                <label>CPF</label>
-                <input name="cpf" inputmode="numeric" required maxlength="14" placeholder="000.000.000-00" data-mask="cpf">
+              <div class="form-grid__cell form-grid__cell--3">
+                <label for="electorCpf">CPF</label>
+                <input id="electorCpf" name="cpf" inputmode="numeric" required maxlength="14" placeholder="000.000.000-00" data-mask="cpf">
               </div>
-              <div class="form-grid__cell form-grid__cell--3" style="display:flex; align-items:flex-end; justify-content:flex-end;">
+              <div class="form-grid__cell form-grid__cell--4 form-grid__cell--submit">
                 <button type="submit" class="btn btn--primary btn--sm">Cadastrar eleitor</button>
               </div>
             </div>
@@ -132,8 +134,8 @@
         </div>
 
         <?php if (!empty($approvedElectors)): ?>
-          <div style="margin-top:6px;">
-            <h3 style="margin:0 0 12px 0;">Eleitores aprovados <span class="muted" style="font-weight:500;">(<?= count($approvedElectors) ?>)</span></h3>
+          <div class="section-head">
+            <h3 class="section-head__title">Eleitores aprovados <span class="muted section-head__count">(<?= count($approvedElectors) ?>)</span></h3>
           </div>
           <div class="table-wrap">
             <table class="table">
@@ -141,7 +143,7 @@
                 <tr>
                   <th>Nome</th>
                   <th style="width:200px;">CPF</th>
-                  <th style="width:120px; text-align:center;">Ação</th>
+                  <th style="width:140px; text-align:center;">Ação</th>
                 </tr>
               </thead>
               <tbody>
@@ -157,15 +159,15 @@
                 ?>
                   <tr>
                     <td>
-                      <div style="font-weight:600;"><?= htmlspecialchars($u['name'], ENT_QUOTES, 'UTF-8') ?></div>
-                      <div class="muted" style="font-size:12px;">Aprovado em <?= htmlspecialchars((string)($u['created_at'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></div>
+                      <div class="cell-name"><?= htmlspecialchars($u['name'], ENT_QUOTES, 'UTF-8') ?></div>
+                      <div class="cell-sub">Aprovado em <?= htmlspecialchars((string)($u['created_at'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></div>
                     </td>
-                    <td style="font-variant-numeric: tabular-nums;"><?= $fmt ?></td>
+                    <td class="cell-mono"><?= $fmt ?></td>
                     <td style="text-align:center;">
                       <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elector/delete" data-confirm="Deseja realmente excluir este eleitor?">
                         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="user_id" value="<?= (int)$u['id'] ?>">
-                        <button type="submit" class="btn btn--secondary btn--sm" style="color:var(--brand-danger); border-color:rgba(220,38,38,.3);">Excluir</button>
+                        <button type="submit" class="btn btn--danger-outline btn--sm">Excluir</button>
                       </form>
                     </td>
                   </tr>
@@ -176,21 +178,19 @@
         <?php endif; ?>
       </section>
 
-      <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="col-stack">
         <section class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-            <h2 style="margin:0;">Assembleias / Eleições</h2>
+          <div class="card__header">
+            <h2 class="card__title-sm">Assembleias / Eleições</h2>
             <a class="btn btn--primary btn--sm" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/new">+ Nova</a>
           </div>
           <?php if (empty($elections)): ?>
-            <div style="padding:18px; background:var(--brand-soft); border:1px solid #BFDBFE; border-radius:var(--radius-lg);">
-              <div class="muted" style="font-weight:600; color:#1E3A8A;">Nenhuma assembleia cadastrada.</div>
-              <div style="margin-top:6px;">
-                <a style="color:var(--brand-primary); font-weight:600;" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/new">Criar primeira assembleia →</a>
-              </div>
+            <div class="empty-state empty-state--blue">
+              <div class="empty-state__title">Nenhuma assembleia cadastrada.</div>
+              <a class="empty-state__cta" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/new">Criar primeira assembleia &rarr;</a>
             </div>
           <?php else: ?>
-            <div style="display:flex; flex-direction:column; gap:12px;">
+            <div class="list-stack">
               <?php foreach ($elections as $e):
                 $statusLabel = $e['status'];
                 $pillClass = 'pill--gray';
@@ -204,49 +204,48 @@
                 elseif ($statusLabel === 'OPEN') $statusPretty = 'Aberta (legado)';
                 elseif ($statusLabel === 'CLOSED') $statusPretty = 'Fechada (legado)';
                 ?>
-                <div style="padding:16px 18px; border:1px solid var(--brand-border); border-radius:var(--radius-lg); background:var(--brand-card); box-shadow:var(--shadow-sm);">
-                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
-                    <div style="flex:1; min-width:220px;">
-                      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                        <span style="font-size:16px; font-weight:700; color:var(--brand-text);"><?= htmlspecialchars($e['title'], ENT_QUOTES, 'UTF-8') ?></span>
-                        <span class="pill <?= $pillClass ?>"><span class="pill__dot" aria-hidden="true"></span> <?= htmlspecialchars($statusPretty, ENT_QUOTES, 'UTF-8') ?></span>
-                      </div>
-                      <div class="muted" style="margin-top:6px; font-size:13px;">
-                        <?= htmlspecialchars($e['type'], ENT_QUOTES, 'UTF-8') ?>
-                        · <?= date('d/m/Y', strtotime($e['election_date'])) ?>
-                        · Esperados: <strong><?= (int)$e['expected_voters'] ?></strong>
-                        <?php if (!empty($e['vacancies'])): ?>
-                          · Vagas: <strong><?= (int)$e['vacancies'] ?></strong>
-                        <?php endif; ?>
-                      </div>
-                      <div class="muted" style="font-size:12px; margin-top:6px; word-break:break-all;">
-                        <span style="font-weight:600;">Link apuração:</span> /dashboard.php?key=<?= htmlspecialchars($e['public_key'], ENT_QUOTES, 'UTF-8') ?>
-                      </div>
+                <article class="list-item">
+                  <div class="list-item__info">
+                    <div class="list-item__title-row">
+                      <h3 class="list-item__title"><?= htmlspecialchars($e['title'], ENT_QUOTES, 'UTF-8') ?></h3>
+                      <span class="pill <?= $pillClass ?>"><span class="pill__dot" aria-hidden="true"></span> <?= htmlspecialchars($statusPretty, ENT_QUOTES, 'UTF-8') ?></span>
                     </div>
-                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
-                      <a class="btn btn--primary btn--sm" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/manage?id=<?= (int)$e['id'] ?>">Gerenciar</a>
-                      <a class="btn btn--secondary btn--sm" target="_blank" rel="noopener noreferrer"
-                         href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/dashboard.php?key=<?= htmlspecialchars($e['public_key'], ENT_QUOTES, 'UTF-8') ?>">Apuração ↗</a>
+                    <div class="list-item__meta">
+                      <?= htmlspecialchars($e['type'], ENT_QUOTES, 'UTF-8') ?>
+                      &nbsp;·&nbsp; <?= date('d/m/Y', strtotime($e['election_date'])) ?>
+                      &nbsp;·&nbsp; Esperados: <strong><?= (int)$e['expected_voters'] ?></strong>
+                      <?php if (!empty($e['vacancies'])): ?>
+                        &nbsp;·&nbsp; Vagas: <strong><?= (int)$e['vacancies'] ?></strong>
+                      <?php endif; ?>
+                    </div>
+                    <div class="list-item__link">
+                      <span class="list-item__link-label">Link apuração:</span>
+                      /dashboard.php?key=<?= htmlspecialchars($e['public_key'], ENT_QUOTES, 'UTF-8') ?>
                     </div>
                   </div>
-                </div>
+                  <div class="list-item__actions">
+                    <a class="btn btn--primary btn--sm" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/manage?id=<?= (int)$e['id'] ?>">Gerenciar</a>
+                    <a class="btn btn--secondary btn--sm" target="_blank" rel="noopener noreferrer"
+                       href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/dashboard.php?key=<?= htmlspecialchars($e['public_key'], ENT_QUOTES, 'UTF-8') ?>">Apuração &nearr;</a>
+                  </div>
+                </article>
               <?php endforeach; ?>
             </div>
           <?php endif; ?>
         </section>
 
         <section class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-            <h2 style="margin:0;">Pendentes de aprovação</h2>
+          <div class="card__header">
+            <h2 class="card__title-sm">Pendentes de aprovação</h2>
             <span class="pill pill--amber"><span class="pill__dot" aria-hidden="true"></span> <?= count($pending) ?> pendente(s)</span>
           </div>
           <?php if (!$pending): ?>
-            <div style="padding:18px; background:#DCFCE7; border:1px solid #BBF7D0; border-radius:var(--radius-lg);">
-              <div style="font-weight:600; color:#166534;">Nenhum cadastro pendente.</div>
-              <div style="font-size:14px; color:var(--brand-muted); margin-top:4px;">Todos os novos eleitores já foram revisados.</div>
+            <div class="empty-state empty-state--green">
+              <div class="empty-state__title">Nenhum cadastro pendente.</div>
+              <div class="empty-state__subtitle">Todos os novos eleitores já foram revisados.</div>
             </div>
           <?php else: ?>
-            <div style="display:flex; flex-direction:column; gap:10px;">
+            <div class="list-stack">
               <?php foreach ($pending as $u):
                 $cpf = is_string($u['cpf'] ?? null) ? $u['cpf'] : '';
                 $d = preg_replace('/\D/', '', $cpf);
@@ -257,11 +256,11 @@
                     $fmt = htmlspecialchars($cpf, ENT_QUOTES, 'UTF-8');
                 }
               ?>
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 16px; border:1px solid var(--brand-border); border-radius:var(--radius-lg); background:var(--brand-card);">
-                  <div style="flex:1; min-width:200px;">
-                    <div style="font-weight:600; color:var(--brand-text); font-size:15px;"><?= htmlspecialchars($u['name'], ENT_QUOTES, 'UTF-8') ?></div>
-                    <div class="muted" style="font-size:13px;">
-                      CPF: <?= $fmt ?> · cadastrado em <?= htmlspecialchars((string)($u['created_at'] ?? '-'), ENT_QUOTES, 'UTF-8') ?>
+                <article class="list-item list-item--pending">
+                  <div class="list-item__info">
+                    <div class="list-item__name"><?= htmlspecialchars($u['name'], ENT_QUOTES, 'UTF-8') ?></div>
+                    <div class="list-item__meta list-item__meta--sm">
+                      CPF: <?= $fmt ?>&nbsp;·&nbsp; cadastrado em <?= htmlspecialchars((string)($u['created_at'] ?? '-'), ENT_QUOTES, 'UTF-8') ?>
                     </div>
                   </div>
                   <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elector/approve">
@@ -269,42 +268,45 @@
                     <input type="hidden" name="user_id" value="<?= (int)$u['id'] ?>">
                     <button type="submit" class="btn btn--success btn--sm">Aprovar</button>
                   </form>
-                </div>
+                </article>
               <?php endforeach; ?>
             </div>
           <?php endif; ?>
         </section>
 
         <section class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-            <h2 style="margin:0;">Usuários do sistema</h2>
-            <span class="muted" style="font-size:13px;">Admin / Condutor</span>
+          <div class="card__header">
+            <div>
+              <h2 class="card__title-sm">Usuários do sistema</h2>
+              <span class="card__hint">Administradores e condutores</span>
+            </div>
           </div>
-          <div style="padding:14px 16px; border:1px solid var(--brand-border); border-radius:var(--radius-lg);">
-            <div style="font-weight:600; margin-bottom:12px;">Novo usuário</div>
+
+          <div class="subcard">
+            <h4 class="subcard__title">Novo usuário</h4>
             <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/user/add">
               <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
               <div class="form-grid g-4">
-                <div class="form-grid__cell form-grid__cell--2">
-                  <label>Nome Completo</label>
-                  <input name="name" required maxlength="160" placeholder="Nome">
+                <div class="form-grid__cell form-grid__cell--4">
+                  <label for="uName">Nome Completo</label>
+                  <input id="uName" name="name" required maxlength="160" placeholder="Nome">
+                </div>
+                <div class="form-grid__cell form-grid__cell--4">
+                  <label for="uEmail">E-mail</label>
+                  <input id="uEmail" name="email" type="email" required maxlength="190" placeholder="nome@empresa.com.br">
                 </div>
                 <div class="form-grid__cell form-grid__cell--2">
-                  <label>E-mail</label>
-                  <input name="email" type="email" required maxlength="190" placeholder="nome@empresa.com.br">
+                  <label for="uPass">Senha</label>
+                  <input id="uPass" name="password" type="password" required autocomplete="new-password">
                 </div>
-                <div class="form-grid__cell form-grid__cell--1">
-                  <label>Senha</label>
-                  <input name="password" type="password" required autocomplete="new-password">
-                </div>
-                <div class="form-grid__cell form-grid__cell--1">
-                  <label>Papel</label>
-                  <select name="role" required>
+                <div class="form-grid__cell form-grid__cell--2">
+                  <label for="uRole">Papel</label>
+                  <select id="uRole" name="role" required>
                     <option value="ADMIN">Administrador</option>
                     <option value="CONDUTOR">Condutor</option>
                   </select>
                 </div>
-                <div class="form-grid__cell form-grid__cell--4" style="display:flex; justify-content:flex-end; align-items:flex-end;">
+                <div class="form-grid__cell form-grid__cell--12 form-grid__cell--submit-end">
                   <button type="submit" class="btn btn--primary btn--sm">Cadastrar usuário</button>
                 </div>
               </div>
@@ -312,14 +314,14 @@
           </div>
 
           <?php if (!empty($systemUsers)): ?>
-            <div class="table-wrap" style="margin-top:14px;">
+            <div class="table-wrap">
               <table class="table">
                 <thead>
                   <tr>
                     <th>Nome</th>
-                    <th style="width:240px;">E-mail</th>
-                    <th style="width:140px;">Papel</th>
-                    <th style="width:120px; text-align:center;">Ação</th>
+                    <th style="width:260px;">E-mail</th>
+                    <th style="width:160px;">Papel</th>
+                    <th style="width:140px; text-align:center;">Ação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -328,8 +330,8 @@
                   ?>
                     <tr>
                       <td>
-                        <div style="font-weight:600;"><?= htmlspecialchars($u['name'], ENT_QUOTES, 'UTF-8') ?></div>
-                        <div class="muted" style="font-size:12px;">Desde <?= htmlspecialchars((string)($u['created_at'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></div>
+                        <div class="cell-name"><?= htmlspecialchars($u['name'], ENT_QUOTES, 'UTF-8') ?></div>
+                        <div class="cell-sub">Desde <?= htmlspecialchars((string)($u['created_at'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></div>
                       </td>
                       <td><?= htmlspecialchars((string)$u['email'], ENT_QUOTES, 'UTF-8') ?></td>
                       <td><span class="pill <?= $pillRole ?>"><?= htmlspecialchars($u['role'], ENT_QUOTES, 'UTF-8') ?></span></td>
@@ -337,7 +339,7 @@
                         <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/user/delete" data-confirm="Deseja realmente excluir este usuário?">
                           <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
                           <input type="hidden" name="user_id" value="<?= (int)$u['id'] ?>">
-                          <button type="submit" class="btn btn--secondary btn--sm" style="color:var(--brand-danger); border-color:rgba(220,38,38,.3);">Excluir</button>
+                          <button type="submit" class="btn btn--danger-outline btn--sm">Excluir</button>
                         </form>
                       </td>
                     </tr>
@@ -350,7 +352,7 @@
       </div>
     </div>
 
-    <div style="margin-top:28px; text-align:center; color:var(--brand-muted); font-size:13px; padding:0 16px 20px 16px;">Painel administrativo Coninfoms Eleição · <?= date('Y') ?></div>
+    <div class="app-footer">Painel administrativo Coninfoms Eleição · <?= date('Y') ?></div>
   </main>
 
   <script src="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.js"></script>

@@ -55,16 +55,15 @@
             Nenhum candidato ativo disponível para o próximo escrutínio.
           </div>
         <?php else: ?>
-          <div style="display:grid; grid-template-columns:1fr; gap:10px;">
+          <div class="candidates-list candidates-list--2col">
             <?php foreach ($candidates as $c): ?>
-              <label class="candidate-card" style="cursor:pointer; display:flex; align-items:center; gap:14px; padding:14px 16px;">
+              <label class="candidate-card">
                 <input
                   type="checkbox"
                   name="candidate_ids[]"
                   value="<?= (int)$c['id'] ?>"
                   class="candidate-cb"
                   checked
-                  style="width:22px; height:22px; flex-shrink:0; accent-color:var(--brand-primary);"
                 >
                 <?php if (!empty($c['photo_path'])): ?>
                   <img
@@ -86,12 +85,12 @@
                     ?>
                   </div>
                 <?php endif; ?>
-                <div style="flex:1; min-width:0;">
-                  <div style="font-weight:600; color:var(--brand-text); font-size:16px; line-height:1.25;">
+                <div class="candidate-body">
+                  <div style="font-weight:700; color:var(--brand-text); font-size:1rem; line-height:1.25;">
                     <?= htmlspecialchars($c['full_name'], ENT_QUOTES, 'UTF-8') ?>
                   </div>
                   <?php if (!empty($c['role_title'])): ?>
-                    <div class="muted" style="font-size:13px; margin-top:2px;">
+                    <div class="candidate-meta">
                       <?= htmlspecialchars($c['role_title'], ENT_QUOTES, 'UTF-8') ?>
                     </div>
                   <?php endif; ?>

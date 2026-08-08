@@ -36,8 +36,9 @@
 
     <div class="toolbar">
       <div class="page-title">
+        <span class="crumbs"><a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin" style="color:inherit; text-decoration:none;">Painel</a> · Lista de presença</span>
         <h1>Lista de Presença</h1>
-        <p class="muted" style="margin-top:2px;">
+        <p class="muted page-subtitle">
           <?= htmlspecialchars($election['title'], ENT_QUOTES, 'UTF-8') ?>
           &nbsp;·&nbsp; Data: <?= date('d/m/Y', strtotime($election['election_date'])) ?>
           &nbsp;·&nbsp; Tipo: <?= htmlspecialchars($election['type'], ENT_QUOTES, 'UTF-8') ?>
@@ -48,7 +49,7 @@
           $status = (string)($election['status'] ?? '');
           $statusMap = [
             'aberta_para_presenca' => ['Aberta para Presença', 'pill--amber'],
-            'aberta_para_votacao'  => ['Aberta para Votação',  'pill--green'],
+            'aberta_para_votacao'  => ['Aberta para Votação',  'pill--blue'],
             'encerrada'            => ['Encerrada',             'pill--red'],
             'OPEN'                 => ['Aberta (Legado)',       'pill--teal'],
             'CLOSED'               => ['Encerrada (Legado)',    'pill--red'],
@@ -62,62 +63,66 @@
     </div>
 
     <?php if (isset($presentCount)): ?>
-      <div class="cols-2 cols--kpi" style="margin-bottom:18px;">
-        <div class="kpi">
+      <div class="cols-2 cols--kpi layout-row">
+        <div class="kpi kpi--green">
           <div class="kpi__label">Presenças Registradas</div>
-          <div class="kpi__value" style="color:var(--brand-success);"><?= (int)$presentCount ?></div>
+          <div class="kpi__value"><?= (int)$presentCount ?></div>
           <div class="kpi__hint">Eleitores com presença confirmada</div>
         </div>
         <div class="kpi">
           <div class="kpi__label">Eleitores Habilitados</div>
-          <div class="kpi__value" style="color:var(--brand-primary);"><?= count($voters) ?></div>
+          <div class="kpi__value"><?= count($voters) ?></div>
           <div class="kpi__hint">Total de eleitores cadastrados</div>
         </div>
       </div>
     <?php endif; ?>
 
-    <div class="card" style="margin-bottom:18px;">
+    <section class="card layout-row">
       <div class="card__header">
-        <h3>Registrar Presença Rapidamente</h3>
-        <span class="muted">Informe CPF e/ou nome para credenciar um eleitor</span>
+        <div>
+          <h3 class="card__title-sm">Registrar Presença Rapidamente</h3>
+          <span class="card__hint">Informe CPF e/ou nome para credenciar um eleitor</span>
+        </div>
       </div>
       <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/attendance/register" class="form-grid g-4">
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '', ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
-        <div class="form-grid__cell">
+        <div class="form-grid__cell form-grid__cell--3">
           <label for="cpf_reg">CPF</label>
           <input id="cpf_reg" type="text" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" data-mask="cpf">
         </div>
-        <div class="form-grid__cell form-grid__cell--2">
-          <label for="nome_reg">Nome (opcional)</label>
+        <div class="form-grid__cell form-grid__cell--6">
+          <label for="nome_reg">Nome <span class="hint-inline">(opcional, ajuda na busca)</span></label>
           <input id="nome_reg" type="text" name="nome" placeholder="Nome completo do eleitor">
         </div>
-        <div class="form-grid__cell" style="display:flex; align-items:flex-end;">
-          <button type="submit" class="btn btn--primary" style="width:100%;">Registrar Presença</button>
+        <div class="form-grid__cell form-grid__cell--3 form-grid__cell--submit">
+          <button type="submit" class="btn btn--primary">Registrar Presença</button>
         </div>
       </form>
-    </div>
+    </section>
 
-    <div class="card">
+    <section class="card">
       <div class="card__header">
-        <h3>Relação de Eleitores</h3>
-        <span class="muted"><?= count($voters) ?> registro(s)</span>
+        <div>
+          <h3 class="card__title-sm">Relação de Eleitores</h3>
+          <span class="card__hint"><?= count($voters) ?> registro(s)</span>
+        </div>
       </div>
       <div class="table-wrap">
         <table class="table">
           <thead>
             <tr>
               <th style="width:5%; text-align:center;">#</th>
-              <th style="width:40%;">Nome do Eleitor</th>
+              <th>Nome do Eleitor</th>
               <th style="width:22%;">CPF</th>
-              <th style="width:13%; text-align:center;">Presença</th>
+              <th style="width:15%; text-align:center;">Presença</th>
               <th style="width:20%; text-align:center;">Ações</th>
             </tr>
           </thead>
           <tbody>
             <?php if (empty($voters)): ?>
               <tr>
-                <td colspan="5" style="text-align: center; padding:28px 16px; color:var(--brand-muted);">
+                <td colspan="5" class="table-empty">
                   Nenhum eleitor habilitado para esta eleição.
                 </td>
               </tr>
@@ -135,9 +140,9 @@
                   $present = !empty($v['presente']);
                 ?>
                 <tr>
-                  <td style="text-align:center; color:var(--brand-muted);"><?= $index + 1 ?></td>
-                  <td style="font-weight:500;"><?= htmlspecialchars((string)($v['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td>
-                  <td style="font-variant-numeric: tabular-nums;"><?= $cpfFmt ?></td>
+                  <td style="text-align:center;" class="cell-muted"><?= $index + 1 ?></td>
+                  <td class="cell-name"><?= htmlspecialchars((string)($v['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td>
+                  <td class="cell-mono"><?= $cpfFmt ?></td>
                   <td style="text-align:center;">
                     <?php if ($present): ?>
                       <span class="pill pill--green">Presente</span>
@@ -166,24 +171,24 @@
         </table>
       </div>
 
-      <div style="margin-top:24px; padding:18px 20px; border:1px solid var(--brand-border); border-radius:var(--radius-lg); background:var(--brand-surface);">
-        <div style="font-weight:600; margin-bottom:10px; color:var(--brand-text);">Legenda do Workflow</div>
-        <div class="cols-3" style="gap:14px;">
-          <div class="workflow-banner wf--presence" style="margin:0; padding:12px 14px;">
-            <strong style="display:block; margin-bottom:2px;">Fase de Presença</strong>
-            <span class="muted" style="font-size:13px;">Eleitores/administradores confirmam presença. Voto bloqueado.</span>
+      <div class="subcard subcard--soft legend-card">
+        <h4 class="subcard__title">Legenda do Workflow</h4>
+        <div class="cols-3">
+          <div class="workflow-banner wf--presence wf-card">
+            <div class="wf-title"><span class="wf-icon" aria-hidden="true">●</span> Fase de Presença</div>
+            <p class="wf-sub">Eleitores e administradores confirmam presença; voto bloqueado.</p>
           </div>
-          <div class="workflow-banner wf--voting" style="margin:0; padding:12px 14px;">
-            <strong style="display:block; margin-bottom:2px;">Fase de Votação</strong>
-            <span class="muted" style="font-size:13px;">Presença confirmada habilita o voto (backend valida).</span>
+          <div class="workflow-banner wf--voting wf-card">
+            <div class="wf-title"><span class="wf-icon" aria-hidden="true">●</span> Fase de Votação</div>
+            <p class="wf-sub">Presença confirmada habilita o voto (back-end valida).</p>
           </div>
-          <div class="workflow-banner wf--closed" style="margin:0; padding:12px 14px;">
-            <strong style="display:block; margin-bottom:2px;">Encerrada</strong>
-            <span class="muted" style="font-size:13px;">Nenhuma ação permitida; relatórios e resultados finais.</span>
+          <div class="workflow-banner wf--closed wf-card">
+            <div class="wf-title"><span class="wf-icon" aria-hidden="true">●</span> Encerrada</div>
+            <p class="wf-sub">Nenhuma ação permitida; relatórios e resultados finais.</p>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   </main>
   <script src="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.js"></script>
 </body>
