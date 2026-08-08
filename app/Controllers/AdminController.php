@@ -13,9 +13,17 @@ final class AdminController extends Controller
     {
         $this->services['auth']->requireRole(['ADMIN','CONDUTOR','SUPER_ADMIN']);
 
+        $userId   = (int)($this->services['auth']->userId() ?? 0);
         $churchId = (int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0);
 
         $pdo = $this->services['pdo'];
+
+        $authUser = null;
+        if ($userId > 0) {
+            $stmt = $pdo->prepare("SELECT id, name, email, role FROM users WHERE id = :uid LIMIT 1");
+            $stmt->execute([':uid' => $userId]);
+            $authUser = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        }
 
         $settings = $pdo->query("SELECT registration_open FROM registration_settings WHERE id = 1")
             ->fetch(PDO::FETCH_ASSOC);
@@ -77,6 +85,9 @@ final class AdminController extends Controller
             'approvedElectors' => $approvedElectors,
             'systemUsers' => $systemUsers,
             'elections' => $elections,
+            'authUser' => $authUser,
+            'authUserName' => (string)($authUser['name'] ?? ''),
+            'authUserRole' => (string)($authUser['role'] ?? ''),
         ]);
     }
 

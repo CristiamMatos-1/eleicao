@@ -996,3 +996,122 @@ td .row { justify-content: flex-start; }
   }
   body { background: #fff !important; }
 }
+
+/* ============================================================
+   Aliases BEM + classes de compatibilidade (Admin Home)
+   ============================================================ */
+
+/* KPI — aliases BEM para hífen antigo */
+.kpi .kpi__label,
+.kpi .kpi-label {
+  color: var(--brand-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.kpi .kpi__value,
+.kpi .kpi-value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--brand-text);
+  line-height: 1.1;
+}
+.kpi .kpi__hint,
+.kpi .kpi-foot {
+  margin-top: 8px;
+  color: var(--brand-muted);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.kpi.cols--kpi .kpi__value { font-size: 1.85rem; }
+
+/* Pills — alias dot BEM */
+.pill__dot,
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.9;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Botão verde (Aprovar / Sucesso) */
+.btn--success {
+  background: var(--brand-success);
+  color: #fff;
+  border-color: var(--brand-success);
+}
+.btn--success:hover {
+  background: #16A34A;
+  border-color: #16A34A;
+  color: #fff;
+}
+
+/* form-grid BEM helpers: 12-colunas (span 1,2,3,4) */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 14px;
+}
+.form-grid.g-6 { gap: 6px; }
+.form-grid.g-4 { gap: 12px; }
+.form-grid.g-3 { gap: 10px; }
+.form-grid.g-2 { gap: 8px; }
+
+.form-grid .form-grid__cell { min-width: 0; }
+.form-grid .form-grid__cell--1,
+.form-grid .g-1 { grid-column: span 12; }
+.form-grid .form-grid__cell--2,
+.form-grid .g-2 { grid-column: span 12; }
+.form-grid .form-grid__cell--3,
+.form-grid .g-3 { grid-column: span 12; }
+.form-grid .form-grid__cell--4,
+.form-grid .g-4 { grid-column: span 12; }
+.form-grid .form-grid__cell--6,
+.form-grid .g-6 { grid-column: span 12; }
+
+@media (min-width: 560px) {
+  .form-grid .form-grid__cell--1, .form-grid .g-1 { grid-column: span 3; }
+  .form-grid .form-grid__cell--2, .form-grid .g-2 { grid-column: span 6; }
+  .form-grid .form-grid__cell--3, .form-grid .g-3 { grid-column: span 6; }
+  .form-grid .form-grid__cell--4, .form-grid .g-4 { grid-column: span 12; }
+  .form-grid .form-grid__cell--6, .form-grid .g-6 { grid-column: span 12; }
+}
+
+@media (min-width: 880px) {
+  .form-grid .form-grid__cell--1, .form-grid .g-1 { grid-column: span 1; }
+  .form-grid .form-grid__cell--2, .form-grid .g-2 { grid-column: span 2; }
+  .form-grid .form-grid__cell--3, .form-grid .g-3 { grid-column: span 3; }
+  .form-grid .form-grid__cell--4, .form-grid .g-4 { grid-column: span 4; }
+  .form-grid .form-grid__cell--6, .form-grid .g-6 { grid-column: span 6; }
+}
+
+@media (max-width: 559px) {
+  .form-grid { gap: 10px; }
+}
+
+/* Label de campos nos forms (padrão) */
+.form-grid label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-text);
+  margin: 0 0 6px 0;
+}
+
+/* Cards aninhados sem sombra extra (Card-Within-Card) */
+.card > .card {
+  box-shadow: none;
+  border: 1px solid var(--brand-border);
+}
+
+/* Ajuste para links dentro de toolbars no admin */
+.page-actions > .btn {
+  text-decoration: none;
+}
+
