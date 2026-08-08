@@ -11,17 +11,16 @@
   <?php
     $navTitle = 'Painel Administrativo';
     $activePath = '/admin/elections/manage';
-    $brandLetter = 'C';
     $navLinks = [
       ['label' => 'Início', 'href' => $baseUrl . '/admin'],
       ['label' => 'Voltar', 'href' => $baseUrl . '/admin'],
     ];
     ob_start();
   ?>
-    <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin" class="btn secondary btn-sm">← Painel</a>
+    <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin" class="btn btn--secondary btn--sm">← Painel</a>
     <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/logout" style="margin:0;">
       <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
-      <button type="submit" class="btn secondary btn-sm">Sair</button>
+      <button type="submit" class="btn btn--secondary btn--sm">Sair</button>
     </form>
   <?php
     $navActions = (string)ob_get_clean();
@@ -31,8 +30,8 @@
 
     <div class="toolbar">
       <div class="page-title">
-        <span class="crumbs"><a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin">Painel</a> · Assembleia</span>
-        <h1 style="margin-top:4px;"><?= htmlspecialchars($election['title'], ENT_QUOTES, 'UTF-8') ?></h1>
+        <span class="muted"><a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin" style="color:inherit; text-decoration:none;">Painel</a> · Assembleia</span>
+        <h1 style="margin-top:4px;"><?= htmlspecialchars((string)($election['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h1>
       </div>
       <div class="page-actions">
         <?php
@@ -46,55 +45,63 @@
           ];
           [$statusLabel, $pillClass] = $statusMap[$status] ?? ['Status desconhecido', 'pill--gray'];
         ?>
-        <span class="pill <?= $pillClass ?>"><span class="pill-dot" aria-hidden="true"></span> <?= htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8') ?></span>
+        <span class="pill <?= $pillClass ?>"><span class="pill__dot" aria-hidden="true"></span> <?= htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8') ?></span>
       </div>
     </div>
 
     <section class="card" style="margin-bottom:18px;">
-      <div class="section-title">
-        <h2>Workflow da Assembleia</h2>
-        <span class="muted">Controle as fases de presença, votação e encerramento</span>
+      <div class="card__header">
+        <div>
+          <h2 style="margin:0;">Workflow da Assembleia</h2>
+          <span class="muted" style="font-size:13px;">Controle as fases de presença, votação e encerramento</span>
+        </div>
       </div>
 
       <div class="cols-3" style="margin-bottom:14px;">
-        <div class="box box-warn">
-          <div class="box-heading"><h4>Fase 1 · Presença</h4></div>
-          <div class="muted" style="font-size:0.88rem; margin-bottom:10px;">
+        <div class="card card--tinted" style="border:1px solid rgba(245,158,11,.18);">
+          <div class="card__header">
+            <h4 style="margin:0;">Fase 1 · Presença</h4>
+          </div>
+          <div class="muted" style="font-size:13px; margin-bottom:10px;">
             Libere a entrada, confirme presença dos eleitores e automatize a abertura do cadastro.
           </div>
           <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/workflow/status" data-confirm="Deseja abrir a fase de presença agora?">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
             <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
             <input type="hidden" name="status" value="presenca">
-            <button type="submit" class="btn btn-block <?= $status === 'aberta_para_presenca' ? 'warn' : 'secondary' ?>" <?= ($status === 'encerrada' || $status === 'CLOSED') ? 'disabled' : '' ?>>
+            <button type="submit" class="btn btn--warning btn--lg" style="width:100%;" <?= ($status === 'encerrada' || $status === 'CLOSED') ? 'disabled' : '' ?>>
               <?= $status === 'aberta_para_presenca' ? 'Atualmente · Presença' : 'Abrir para Presença' ?>
             </button>
           </form>
         </div>
-        <div class="box box-info">
-          <div class="box-heading"><h4>Fase 2 · Votação</h4></div>
-          <div class="muted" style="font-size:0.88rem; margin-bottom:10px;">
+        <div class="card card--tinted" style="border:1px solid rgba(59,130,246,.18);">
+          <div class="card__header">
+            <h4 style="margin:0;">Fase 2 · Votação</h4>
+          </div>
+          <div class="muted" style="font-size:13px; margin-bottom:10px;">
             Libere a cédula para todos os eleitores com presença confirmada.
           </div>
           <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/workflow/status" data-confirm="Deseja abrir a votação agora?">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
             <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
             <input type="hidden" name="status" value="votacao">
-            <button type="submit" class="btn btn-block <?= $status === 'aberta_para_votacao' ? '' : 'secondary' ?>" <?= ($status === 'encerrada' || $status === 'CLOSED') ? 'disabled' : '' ?>>
+            <button type="submit" class="btn btn--primary btn--lg" style="width:100%;" <?= ($status === 'encerrada' || $status === 'CLOSED') ? 'disabled' : '' ?>>
               <?= $status === 'aberta_para_votacao' ? 'Atualmente · Votação' : 'Abrir para Votação' ?>
             </button>
           </form>
         </div>
-        <div class="box box-danger">
-          <div class="box-heading"><h4>Fase 3 · Encerrar</h4></div>
-          <div class="muted" style="font-size:0.88rem; margin-bottom:10px;">
+        <div class="card card--tinted" style="border:1px solid rgba(220,38,38,.18);">
+          <div class="card__header">
+            <h4 style="margin:0;">Fase 3 · Encerrar</h4>
+          </div>
+          <div class="muted" style="font-size:13px; margin-bottom:10px;">
             Encerra a assembleia, fecha todos os escrutínios abertos e trava presenças e votos.
           </div>
           <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/workflow/status" data-confirm="Tem certeza que deseja encerrar esta eleição? Após encerrada, presenças e votos não podem ser mais inseridos.">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
             <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
             <input type="hidden" name="status" value="encerrada">
-            <button type="submit" class="btn btn-block <?= ($status === 'encerrada' || $status === 'CLOSED') ? '' : 'danger secondary' ?>" <?= ($status === 'encerrada' || $status === 'CLOSED') ? 'disabled' : '' ?>>
+            <button type="submit" class="btn btn--danger btn--lg" style="width:100%;" <?= ($status === 'encerrada' || $status === 'CLOSED') ? 'disabled' : '' ?>>
               <?= ($status === 'encerrada' || $status === 'CLOSED') ? 'Assembleia Encerrada' : 'Encerrar Eleição' ?>
             </button>
           </form>
@@ -102,76 +109,114 @@
       </div>
 
       <div class="cols-2" style="margin-bottom:10px;">
-        <div class="box box-info">
-          <div class="box-heading"><h4>Lista de Presença</h4></div>
-          <div class="muted" style="font-size:0.88rem; margin-bottom:10px;">
+        <div class="card card--tinted" style="border:1px solid rgba(59,130,246,.18);">
+          <div class="card__header">
+            <h4 style="margin:0;">Lista de Presença</h4>
+          </div>
+          <div class="muted" style="font-size:13px; margin-bottom:10px;">
             Veja quem confirmou presença, registre manualmente ou imprima.
           </div>
-          <div class="row row--tight">
-            <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" class="btn">Ver Lista Completa</a>
-            <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance/pdf?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" class="btn secondary">Exportar PDF ↓</a>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" class="btn btn--primary">Ver Lista Completa</a>
+            <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance/pdf?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">Exportar PDF ↓</a>
           </div>
         </div>
-        <div class="box box-soft">
-          <div class="box-heading"><h4>Painel Público de Apuração</h4></div>
-          <div class="muted" style="font-size:0.88rem; margin-bottom:8px;">Compartilhe este link com a comunidade:</div>
+        <div class="card card--tinted" style="border:1px dashed rgba(0,74,173,.35);">
+          <div class="card__header">
+            <h4 style="margin:0;">Painel Público de Apuração</h4>
+          </div>
+          <div class="muted" style="font-size:13px; margin-bottom:8px;">Compartilhe este link com a comunidade:</div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <code style="flex:1; min-width:240px; background:#F3F4F6; border:1px solid var(--brand-border); padding:10px 12px; border-radius:var(--radius-sm); font-size:0.82rem; word-break:break-all; color:var(--brand-text);"><?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/dashboard.php?key=<?= htmlspecialchars($election['public_key'], ENT_QUOTES, 'UTF-8') ?></code>
-            <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/dashboard.php?key=<?= htmlspecialchars($election['public_key'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" class="btn ghost">Abrir ↗</a>
+            <code style="flex:1; min-width:240px; background:#F3F4F6; border:1px solid var(--brand-border); padding:10px 12px; border-radius:10px; font-size:12px; word-break:break-all; color:var(--brand-text);"><?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/dashboard.php?key=<?= htmlspecialchars((string)($election['public_key'] ?? ''), ENT_QUOTES, 'UTF-8') ?></code>
+            <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/dashboard.php?key=<?= htmlspecialchars((string)($election['public_key'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">Abrir ↗</a>
           </div>
         </div>
       </div>
 
-      <?php if (in_array($status, ['OPEN','aberta_para_presenca','aberta_para_votacao'], true)): ?>
-        <div class="box">
-          <div class="box-heading"><h4>Parâmetros de encerramento automático</h4></div>
-          <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/config/edit" class="form" style="margin-top:0;">
+      <?php if (in_array($status, ['OPEN','aberta_para_presenca','aberta_para_votacao'], true)):
+        $entityName = (string)(($election['entity_name'] ?? '') !== '' ? $election['entity_name'] : ($election['church_legal_name'] ?? ($election['church_name'] ?? '')));
+        $assemblyTypeRaw = strtoupper((string)($election['assembly_type'] ?? 'ORDINARIA'));
+        $electionDateVal = (string)($election['election_date'] ?? date('Y-m-d'));
+      ?>
+        <div class="card card--tinted" style="border:1px solid rgba(16,185,129,.18);">
+          <div class="card__header">
+            <h4 style="margin:0;">Parâmetros da Assembleia</h4>
+            <span class="pill pill--teal">Editável</span>
+          </div>
+          <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/config/edit" style="margin-top:0;">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
             <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
-            <div class="row" style="align-items:flex-end; gap:12px;">
-              <div class="field" style="flex:1; min-width:220px;">
-                <label>Número de eleitores esperados</label>
-                <input type="number" name="expected_voters" value="<?= (int)$election['expected_voters'] ?>" min="1" required style="max-width:180px;">
-                <span class="hint">Usado para cálculo de quórum e encerramento automático.</span>
+            <div class="form-grid g-4">
+              <div class="form-grid__cell form-grid__cell--6">
+                <label>Título da Assembleia</label>
+                <input name="title" value="<?= htmlspecialchars((string)($election['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required maxlength="190">
               </div>
-              <button type="submit" class="btn">Atualizar</button>
+              <div class="form-grid__cell">
+                <label>Natureza da Assembleia</label>
+                <select name="assembly_type" required>
+                  <option value="ORDINARIA" <?= $assemblyTypeRaw !== 'EXTRAORDINARIA' ? 'selected' : '' ?>>Ordinária</option>
+                  <option value="EXTRAORDINARIA" <?= $assemblyTypeRaw === 'EXTRAORDINARIA' ? 'selected' : '' ?>>Extraordinária</option>
+                </select>
+              </div>
+              <div class="form-grid__cell">
+                <label>Data da Assembleia</label>
+                <input type="date" name="election_date" value="<?= htmlspecialchars($electionDateVal, ENT_QUOTES, 'UTF-8') ?>" required>
+              </div>
+              <div class="form-grid__cell form-grid__cell--2">
+                <label>Nome da Entidade / Condomínio (Razão Social p/ PDF)</label>
+                <input name="entity_name" value="<?= htmlspecialchars($entityName, ENT_QUOTES, 'UTF-8') ?>" maxlength="255" placeholder="Ex: Igreja Batista da Esperança EIRELI - ME">
+              </div>
+              <div class="form-grid__cell">
+                <label>Eleitores Esperados</label>
+                <input type="number" name="expected_voters" value="<?= (int)($election['expected_voters'] ?? 0) ?>" min="1" required>
+              </div>
+              <div class="form-grid__cell" style="display:flex; align-items:flex-end; justify-content:flex-end;">
+                <button type="submit" class="btn btn--primary btn--lg">Salvar Parâmetros →</button>
+              </div>
+              <div class="form-grid__cell form-grid__cell--6">
+                <span class="muted" style="font-size:12px;">
+                  Usado para cálculo de quórum, encerramento automático e cabeçalho do PDF de Lista de Presença.
+                </span>
+              </div>
             </div>
           </form>
         </div>
       <?php endif; ?>
     </section>
 
-    <?php if ($election['type'] === 'DIRETORIA'): ?>
+    <?php if (($election['type'] ?? '') === 'DIRETORIA'): ?>
       <section class="card" style="margin-bottom:18px;">
-        <div class="section-title">
-          <h2>Credenciamento de Deputados</h2>
-          <span class="muted">Eleitores e candidatos autorizados</span>
+        <div class="card__header">
+          <div>
+            <h2 style="margin:0;">Credenciamento de Deputados</h2>
+            <span class="muted" style="font-size:13px;">Eleitores e candidatos autorizados</span>
+          </div>
         </div>
         <div class="cols-2">
-          <div class="box box-success">
-            <div class="box-heading">
-              <h4>Credenciados <span class="pill pill--green" style="margin-left:8px;"><?= count($accreditedVoters) ?></span></h4>
-              <div>
-                <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" class="btn ghost btn-sm">Lista de Presença</a>
-                <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance/pdf?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" class="btn secondary btn-sm">PDF</a>
+          <div class="card card--tinted" style="border:1px solid rgba(16,185,129,.18);">
+            <div class="card__header">
+              <h4 style="margin:0;">Credenciados <span class="pill pill--green" style="margin-left:8px;"><?= count($accreditedVoters ?? []) ?></span></h4>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" class="btn btn--secondary btn--sm">Lista de Presença</a>
+                <a href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance/pdf?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>" target="_blank" class="btn btn--secondary btn--sm">PDF</a>
               </div>
             </div>
             <div style="max-height: 240px; overflow-y:auto;">
               <?php if (empty($accreditedVoters)): ?>
                 <div class="muted">Nenhum eleitor credenciado.</div>
               <?php else: ?>
-                <div class="list">
-                  <?php foreach($accreditedVoters as $v): ?>
-                    <div class="row itemRow" style="padding:8px 10px; border-radius:var(--radius-md);">
+                <div>
+                  <?php foreach(($accreditedVoters ?? []) as $v): ?>
+                    <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; margin-bottom:4px;">
                       <div style="min-width:0; flex:1;">
-                        <div style="font-weight:600; font-size:0.94rem;"><?= htmlspecialchars($v['name'], ENT_QUOTES, 'UTF-8') ?></div>
+                        <div style="font-weight:600; font-size:14px;"><?= htmlspecialchars((string)($v['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
                       </div>
                       <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/accreditation/toggle" style="margin:0;" data-confirm="Remover credenciamento deste eleitor?">
                         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
-                        <input type="hidden" name="user_id" value="<?= (int)$v['id'] ?>">
+                        <input type="hidden" name="user_id" value="<?= (int)($v['id'] ?? 0) ?>">
                         <input type="hidden" name="action" value="remove">
-                        <button type="submit" class="btn secondary btn-sm" style="color:var(--brand-danger); border-color:rgba(220,38,38,0.28);">Remover</button>
+                        <button type="submit" class="btn btn--secondary btn--sm" style="color:var(--brand-danger); border-color:rgba(220,38,38,0.28);">Remover</button>
                       </form>
                     </div>
                   <?php endforeach; ?>
@@ -179,26 +224,26 @@
               <?php endif; ?>
             </div>
           </div>
-          <div class="box">
-            <div class="box-heading">
-              <h4>Não credenciados <span class="pill pill--gray" style="margin-left:8px;"><?= count($unaccreditedVoters) ?></span></h4>
+          <div class="card card--tinted">
+            <div class="card__header">
+              <h4 style="margin:0;">Não credenciados <span class="pill pill--gray" style="margin-left:8px;"><?= count($unaccreditedVoters ?? []) ?></span></h4>
             </div>
             <div style="max-height: 240px; overflow-y:auto;">
               <?php if (empty($unaccreditedVoters)): ?>
                 <div class="muted">Todos os eleitores ativos estão credenciados.</div>
               <?php else: ?>
-                <div class="list">
-                  <?php foreach($unaccreditedVoters as $v): ?>
-                    <div class="row itemRow" style="padding:8px 10px; border-radius:var(--radius-md);">
+                <div>
+                  <?php foreach(($unaccreditedVoters ?? []) as $v): ?>
+                    <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; margin-bottom:4px; background:rgba(148,163,184,0.05);">
                       <div style="min-width:0; flex:1;">
-                        <div style="font-weight:500; font-size:0.94rem; color:var(--brand-muted);"><?= htmlspecialchars($v['name'], ENT_QUOTES, 'UTF-8') ?></div>
+                        <div style="font-weight:500; font-size:14px; color:var(--brand-muted);"><?= htmlspecialchars((string)($v['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
                       </div>
                       <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/accreditation/toggle" style="margin:0;">
                         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
-                        <input type="hidden" name="user_id" value="<?= (int)$v['id'] ?>">
+                        <input type="hidden" name="user_id" value="<?= (int)($v['id'] ?? 0) ?>">
                         <input type="hidden" name="action" value="add">
-                        <button type="submit" class="btn success btn-sm">Credenciar</button>
+                        <button type="submit" class="btn btn--success btn--sm">Credenciar</button>
                       </form>
                     </div>
                   <?php endforeach; ?>
@@ -211,34 +256,36 @@
     <?php endif; ?>
 
     <section class="card" style="margin-bottom:18px;">
-      <div class="section-title">
-        <h2>Escrutínios e Apuração Atual</h2>
-        <?php if ($election['status'] === 'OPEN' && in_array($election['type'], ['OFICIAIS', 'DIRETORIA', 'SOCIEDADES'], true) && (!empty($scrutiniums) && $scrutiniums[0]['status'] === 'CLOSED')): ?>
-          <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/scrutiny/next?id=<?= (int)$election['id'] ?>" class="btn">+ Abrir Próximo Escrutínio</a>
+      <div class="card__header">
+        <div>
+          <h2 style="margin:0;">Escrutínios e Apuração Atual</h2>
+        </div>
+        <?php if (in_array($status, ['OPEN','aberta_para_presenca','aberta_para_votacao'], true) && in_array(($election['type'] ?? ''), ['OFICIAIS', 'DIRETORIA', 'SOCIEDADES'], true) && (!empty($scrutiniums) && ($scrutiniums[0]['status'] ?? '') === 'CLOSED')): ?>
+          <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/scrutiny/next?id=<?= (int)$election['id'] ?>" class="btn btn--primary">+ Abrir Próximo Escrutínio</a>
         <?php endif; ?>
       </div>
 
       <?php if (!empty($voteCounts)):
-        $currentScrutinyExpected = !empty($scrutiniums) ? (int)$scrutiniums[0]['expected_voters'] : (int)$election['expected_voters'];
+        $currentScrutinyExpected = !empty($scrutiniums) ? (int)($scrutiniums[0]['expected_voters'] ?? 0) : (int)($election['expected_voters'] ?? 0);
         $quorum = intdiv($currentScrutinyExpected, 2) + 1;
       ?>
-        <div class="box box-info" style="margin-bottom:12px;">
-          <div class="box-heading">
-            <h4>Apuração do Escrutínio Atual</h4>
+        <div class="card card--tinted" style="margin-bottom:12px; border:1px solid rgba(59,130,246,.18);">
+          <div class="card__header">
+            <h4 style="margin:0;">Apuração do Escrutínio Atual</h4>
             <span class="pill pill--blue">Quórum: <?= (int)$quorum ?> voto(s)</span>
           </div>
           <div class="cols-2">
             <?php foreach($voteCounts as $vc):
-              $isElectedLive = ($vc['name'] !== 'BRANCOS' && (int)$vc['votes'] >= $quorum);
+              $isElectedLive = (($vc['name'] ?? '') !== 'BRANCOS' && (int)($vc['votes'] ?? 0) >= $quorum);
             ?>
-              <div class="card-flat" style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 14px; border-radius:var(--radius-md);">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 14px; border-radius:10px; background:#fff; box-shadow:0 1px 2px rgba(15,23,42,0.05); border:1px solid var(--brand-border);">
                 <div style="min-width:0;">
-                  <div style="font-weight:700;"><?= htmlspecialchars((string)$vc['name'], ENT_QUOTES, 'UTF-8') ?></div>
+                  <div style="font-weight:700;"><?= htmlspecialchars((string)($vc['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
                   <?php if($isElectedLive): ?>
-                    <span class="pill pill--green" style="margin-top:4px; font-size:0.72rem;"><span class="pill-dot"></span> ELEITO</span>
+                    <span class="pill pill--green" style="margin-top:4px; font-size:11px;"><span class="pill__dot"></span> ELEITO</span>
                   <?php endif; ?>
                 </div>
-                <div class="big" style="color:var(--brand-primary);"><?= (int)$vc['votes'] ?> voto(s)</div>
+                <div style="color:var(--brand-primary); font-weight:700; font-size:16px;"><?= (int)($vc['votes'] ?? 0) ?> voto(s)</div>
               </div>
             <?php endforeach; ?>
           </div>
@@ -246,7 +293,7 @@
       <?php endif; ?>
 
       <div class="table-wrap">
-        <table>
+        <table class="table">
           <thead>
             <tr>
               <th>Escrutínio</th>
@@ -256,23 +303,23 @@
             </tr>
           </thead>
           <tbody>
-            <?php foreach ($scrutiniums as $s): ?>
+            <?php foreach (($scrutiniums ?? []) as $s): ?>
               <tr>
-                <td style="font-weight:700;">#<?= (int)$s['number'] ?></td>
+                <td style="font-weight:700;">#<?= (int)($s['number'] ?? 0) ?></td>
                 <td>
                   <?php
                     $sPill = ($s['status'] ?? '') === 'OPEN' ? 'pill--green' : 'pill--gray';
                   ?>
-                  <span class="pill <?= $sPill ?>"><span class="pill-dot" aria-hidden="true"></span> <?= htmlspecialchars($s['status'], ENT_QUOTES, 'UTF-8') ?></span>
+                  <span class="pill <?= $sPill ?>"><span class="pill__dot" aria-hidden="true"></span> <?= htmlspecialchars((string)($s['status'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                 </td>
-                <td><strong><?= (int)$s['vote_count'] ?></strong> / <?= (int)$s['expected_voters'] ?></td>
+                <td><strong><?= (int)($s['vote_count'] ?? 0) ?></strong> / <?= (int)($s['expected_voters'] ?? 0) ?></td>
                 <td style="text-align:right;">
-                  <?php if ($s['status'] === 'OPEN'): ?>
+                  <?php if (($s['status'] ?? '') === 'OPEN'): ?>
                     <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/scrutiny/reset" data-confirm="ATENÇÃO! Deseja zerar todos os votos deste escrutínio?">
                       <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
-                      <input type="hidden" name="scrutiny_id" value="<?= (int)$s['id'] ?>">
+                      <input type="hidden" name="scrutiny_id" value="<?= (int)($s['id'] ?? 0) ?>">
                       <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
-                      <button type="submit" class="btn secondary btn-sm" style="color:var(--brand-danger); border-color:rgba(220,38,38,0.28);">Zerar Votos</button>
+                      <button type="submit" class="btn btn--secondary btn--sm" style="color:var(--brand-danger); border-color:rgba(220,38,38,0.28);">Zerar Votos</button>
                     </form>
                   <?php endif; ?>
                 </td>
@@ -284,12 +331,14 @@
     </section>
 
     <section class="card" style="margin-bottom:18px;">
-      <div class="section-title">
-        <h2>Candidatos</h2>
-        <span class="muted">Editar, excluir ou adicionar novos</span>
+      <div class="card__header">
+        <div>
+          <h2 style="margin:0;">Candidatos</h2>
+          <span class="muted" style="font-size:13px;">Editar, excluir ou adicionar novos</span>
+        </div>
       </div>
-      <div class="list">
-        <?php foreach ($candidates as $c):
+      <div>
+        <?php foreach (($candidates ?? []) as $c):
           $initials = '';
           $nameForInitials = trim((string)($c['full_name'] ?? ''));
           if ($nameForInitials !== '') {
@@ -302,49 +351,49 @@
           }
           $initials = mb_strtoupper($initials);
         ?>
-          <div class="itemRow" style="margin-bottom:0;">
-            <div class="row--start" style="display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+          <div style="margin-bottom:0; padding:10px 0; border-top:1px solid var(--brand-border);">
+            <div style="display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap;">
               <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:240px;">
                 <?php if (!empty($c['photo_path'])): ?>
-                  <img src="<?= htmlspecialchars($baseUrl . '/' . ltrim($c['photo_path'], '/'), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($c['full_name'], ENT_QUOTES, 'UTF-8') ?>" style="width:44px; height:44px; border-radius:var(--radius-md); object-fit:cover;">
+                  <img src="<?= htmlspecialchars($baseUrl . '/' . ltrim((string)$c['photo_path'], '/'), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($c['full_name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" style="width:44px; height:44px; border-radius:10px; object-fit:cover;">
                 <?php else: ?>
-                  <div class="candidate-photo" style="width:44px; height:44px; border-radius:var(--radius-md); font-size:0.95rem;"><?= htmlspecialchars($initials, ENT_QUOTES, 'UTF-8') ?></div>
+                  <div class="candidate-photo" style="width:44px; height:44px; border-radius:10px; font-size:14px;"><?= htmlspecialchars($initials, ENT_QUOTES, 'UTF-8') ?></div>
                 <?php endif; ?>
                 <div style="min-width:0;">
-                  <div class="big" style="font-size:1rem;"><?= htmlspecialchars($c['full_name'], ENT_QUOTES, 'UTF-8') ?></div>
-                  <div class="row row--tight" style="margin-top:4px;">
-                    <span class="pill" style="margin:0;"><?= htmlspecialchars($c['status'], ENT_QUOTES, 'UTF-8') ?></span>
+                  <div style="font-weight:600; font-size:14px;"><?= htmlspecialchars((string)($c['full_name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
+                  <div style="display:flex; gap:6px; margin-top:4px; flex-wrap:wrap;">
+                    <span class="pill" style="margin:0;"><?= htmlspecialchars((string)($c['status'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                   </div>
                 </div>
               </div>
-              <div class="row row--tight" style="justify-content:flex-end; flex-wrap:wrap;">
-                <button type="button" class="btn secondary btn-sm" data-toggle-inline="#editForm<?= (int)$c['id'] ?>">Editar</button>
+              <div style="display:flex; gap:6px; justify-content:flex-end; flex-wrap:wrap;">
+                <button type="button" class="btn btn--secondary btn--sm" data-toggle-inline="#editForm<?= (int)($c['id'] ?? 0) ?>">Editar</button>
                 <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/candidate/delete" data-confirm="Excluir este candidato?" style="margin:0;">
                   <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
-                  <input type="hidden" name="candidate_id" value="<?= (int)$c['id'] ?>">
+                  <input type="hidden" name="candidate_id" value="<?= (int)($c['id'] ?? 0) ?>">
                   <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
-                  <button type="submit" class="btn secondary btn-sm" style="color:var(--brand-danger); border-color:rgba(220,38,38,0.28);">Excluir</button>
+                  <button type="submit" class="btn btn--secondary btn--sm" style="color:var(--brand-danger); border-color:rgba(220,38,38,0.28);">Excluir</button>
                 </form>
               </div>
             </div>
 
-            <div id="editForm<?= (int)$c['id'] ?>" class="box box-soft" style="display:none; margin-top:10px; border-radius:var(--radius-md);">
-              <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/candidate/edit" enctype="multipart/form-data" class="form" style="margin-top:0;">
+            <div id="editForm<?= (int)($c['id'] ?? 0) ?>" class="card card--tinted" style="display:none; margin-top:10px; border-radius:10px;">
+              <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/candidate/edit" enctype="multipart/form-data" style="margin-top:0;">
                 <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
-                <input type="hidden" name="candidate_id" value="<?= (int)$c['id'] ?>">
+                <input type="hidden" name="candidate_id" value="<?= (int)($c['id'] ?? 0) ?>">
                 <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
-                <div class="form-grid">
-                  <div class="g-6 field">
+                <div class="form-grid g-4">
+                  <div class="form-grid__cell form-grid__cell--2">
                     <label>Nome</label>
-                    <input name="full_name" value="<?= htmlspecialchars($c['full_name'], ENT_QUOTES, 'UTF-8') ?>" required maxlength="160">
+                    <input name="full_name" value="<?= htmlspecialchars((string)($c['full_name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required maxlength="160">
                   </div>
-                  <div class="g-6 field">
+                  <div class="form-grid__cell form-grid__cell--2">
                     <label>Nova Foto (opcional)</label>
                     <input type="file" name="photo" accept="image/*" style="background:transparent; border:1px dashed var(--brand-border); padding:8px 10px;">
                   </div>
-                  <div class="g-12" style="grid-column: span 12; display:flex; gap:8px; justify-content:flex-end;">
-                    <button type="button" class="btn secondary" data-toggle-inline="#editForm<?= (int)$c['id'] ?>">Cancelar</button>
-                    <button type="submit" class="btn">Salvar Alterações</button>
+                  <div class="form-grid__cell form-grid__cell--4" style="display:flex; gap:8px; justify-content:flex-end;">
+                    <button type="button" class="btn btn--secondary" data-toggle-inline="#editForm<?= (int)($c['id'] ?? 0) ?>">Cancelar</button>
+                    <button type="submit" class="btn btn--primary">Salvar Alterações →</button>
                   </div>
                 </div>
               </form>
@@ -353,23 +402,25 @@
         <?php endforeach; ?>
       </div>
 
-      <?php if (in_array($election['type'], ['OFICIAIS', 'SOCIEDADES'], true)): ?>
-        <div class="box box-info" style="margin-top:16px;">
-          <div class="box-heading"><h4>Adicionar candidato</h4></div>
-          <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/candidate/add" class="form" enctype="multipart/form-data" style="margin-top:0;">
+      <?php if (in_array(($election['type'] ?? ''), ['OFICIAIS', 'SOCIEDADES'], true)): ?>
+        <div class="card card--tinted" style="margin-top:16px; border:1px solid rgba(59,130,246,.18);">
+          <div class="card__header">
+            <h4 style="margin:0;">Adicionar candidato</h4>
+          </div>
+          <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/candidate/add" enctype="multipart/form-data" style="margin-top:0;">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
             <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
-            <div class="form-grid">
-              <div class="g-6 field">
+            <div class="form-grid g-4">
+              <div class="form-grid__cell form-grid__cell--2">
                 <label>Nome completo</label>
                 <input name="full_name" required maxlength="160" placeholder="Nome do candidato">
               </div>
-              <div class="g-6 field">
+              <div class="form-grid__cell form-grid__cell--2">
                 <label>Foto (Opcional)</label>
                 <input type="file" name="photo" accept="image/*" style="background:transparent; border:1px dashed var(--brand-border); padding:8px 10px;">
               </div>
-              <div class="g-12" style="grid-column: span 12; display:flex; justify-content:flex-end;">
-                <button type="submit" class="btn">Adicionar candidato</button>
+              <div class="form-grid__cell form-grid__cell--4" style="display:flex; justify-content:flex-end;">
+                <button type="submit" class="btn btn--primary">Adicionar candidato →</button>
               </div>
             </div>
           </form>
@@ -378,28 +429,30 @@
     </section>
 
     <section class="card" style="margin-bottom:18px;">
-      <div class="section-title">
-        <h2>Eleitos</h2>
-        <span class="muted">Resultados oficiais registrados</span>
+      <div class="card__header">
+        <div>
+          <h2 style="margin:0;">Eleitos</h2>
+          <span class="muted" style="font-size:13px;">Resultados oficiais registrados</span>
+        </div>
       </div>
-      <?php if (!$elected): ?>
-        <div class="box box-soft">
-          <div class="muted" style="font-weight:600;">Nenhum eleito registrado ainda.</div>
-          <div style="font-size:0.9rem; color:var(--brand-muted); margin-top:4px;">Continue a apuração e os eleitos aparecerão aqui automaticamente.</div>
+      <?php if (empty($elected)): ?>
+        <div class="card card--tinted">
+          <div style="font-weight:600;">Nenhum eleito registrado ainda.</div>
+          <div style="font-size:14px; color:var(--brand-muted); margin-top:4px;">Continue a apuração e os eleitos aparecerão aqui automaticamente.</div>
         </div>
       <?php else: ?>
-        <div class="list">
-          <?php foreach ($elected as $e):
+        <div>
+          <?php foreach (($elected ?? []) as $e):
             $rulePill = ($e['rule'] ?? '') === 'MAIORIA' ? 'pill--blue' : 'pill--teal';
           ?>
-            <div class="row itemRow">
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 4px; border-top:1px solid var(--brand-border);">
               <div style="min-width:0; flex:1;">
-                <div class="big"><?= htmlspecialchars($e['full_name'], ENT_QUOTES, 'UTF-8') ?></div>
+                <div style="font-weight:600;"><?= htmlspecialchars((string)($e['full_name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
                 <div class="muted">
-                  Escrutínio: <?= (int)$e['elected_in_scrutiny'] ?> · Votos: <strong><?= (int)($e['votes'] ?? 0) ?></strong>
+                  Escrutínio: <?= (int)($e['elected_in_scrutiny'] ?? 0) ?> · Votos: <strong><?= (int)($e['votes'] ?? 0) ?></strong>
                 </div>
               </div>
-              <span class="pill <?= $rulePill ?>"><?= htmlspecialchars($e['rule'], ENT_QUOTES, 'UTF-8') ?></span>
+              <span class="pill <?= $rulePill ?>"><?= htmlspecialchars((string)($e['rule'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
           <?php endforeach; ?>
         </div>
@@ -408,21 +461,23 @@
 
     <?php if (!empty($pendingVoters)): ?>
       <section class="card">
-        <div class="section-title">
-          <h2>Ainda Não Votaram</h2>
+        <div class="card__header">
+          <div>
+            <h2 style="margin:0;">Ainda Não Votaram</h2>
+          </div>
           <span class="pill pill--amber"><?= count($pendingVoters) ?> pendentes</span>
         </div>
-        <div class="box">
-          <ul style="margin:0; padding-left:20px; columns: 2; column-gap: 24px; font-size:0.92rem; color:var(--brand-muted);">
+        <div class="card card--tinted">
+          <ul style="margin:0; padding-left:20px; columns: 2; column-gap: 24px; font-size:14px; color:var(--brand-muted);">
             <?php foreach($pendingVoters as $name): ?>
-              <li style="padding:3px 0; break-inside: avoid;"><?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?></li>
+              <li style="padding:3px 0; break-inside: avoid;"><?= htmlspecialchars((string)$name, ENT_QUOTES, 'UTF-8') ?></li>
             <?php endforeach; ?>
           </ul>
         </div>
       </section>
     <?php endif; ?>
 
-    <div class="footer-mini">Gerenciamento de assembleia · Coninfoms Eleição · <?= date('Y') ?></div>
+    <div style="text-align:center; padding:16px; color:var(--brand-muted); font-size:12px;">Gerenciamento de assembleia · Coninfoms Eleição · <?= date('Y') ?></div>
   </main>
 
   <script src="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.js"></script>

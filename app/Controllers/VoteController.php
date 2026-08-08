@@ -18,13 +18,33 @@ final class VoteController extends Controller
         $pdo = $this->services['pdo'];
         $churchId = (int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0);
 
-        $e = $pdo->prepare("SELECT id, type, title, status, vacancies FROM elections WHERE status IN ('OPEN','aberta_para_presenca','aberta_para_votacao') AND church_id = :cid ORDER BY id DESC LIMIT 1");
+        $e = $pdo->prepare(
+            "SELECT e.id, e.type, e.assembly_type, e.title, e.election_date, e.status, e.vacancies,
+                    c.name AS church_name, c.legal_name AS church_legal_name
+             FROM elections e
+             INNER JOIN churches c ON c.id = e.church_id
+             WHERE e.status IN ('OPEN','aberta_para_presenca','aberta_para_votacao')
+               AND e.church_id = :cid
+             ORDER BY e.id DESC
+             LIMIT 1"
+        );
         $e->execute([':cid' => $churchId]);
         $e = $e->fetch(PDO::FETCH_ASSOC);
 
         if (!$e) {
             throw new RuntimeException('Não há eleição aberta.');
         }
+        if (!isset($e['assembly_type']) || $e['assembly_type'] === null || $e['assembly_type'] === '') {
+            $e['assembly_type'] = 'ORDINARIA';
+        }
+        $entityName = (string)($e['church_legal_name'] ?? $e['church_name'] ?? '');
+        if ($entityName === '') {
+            $cStmt = $pdo->prepare("SELECT name, legal_name FROM churches WHERE id = :cid LIMIT 1");
+            $cStmt->execute([':cid' => $churchId]);
+            $ch = $cStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+            $entityName = (string)(($ch['legal_name'] ?? '') !== '' ? $ch['legal_name'] : ($ch['name'] ?? ''));
+        }
+        $e['entity_name'] = $entityName;
 
         $workflowLocked = !in_array($e['status'], ['OPEN', AttendanceService::STATUS_VOTACAO], true);
 

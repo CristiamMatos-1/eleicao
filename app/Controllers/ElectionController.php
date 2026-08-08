@@ -16,8 +16,22 @@ final class ElectionController extends Controller
     {
         $this->services['auth']->requireRole(['ADMIN','SUPER_ADMIN']);
 
+        $pdo = $this->services['pdo'];
+        $churchId = (int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0);
+        $church = ['name' => '', 'legal_name' => ''];
+        if ($churchId > 0) {
+            $cStmt = $pdo->prepare("SELECT name, legal_name FROM churches WHERE id = :cid LIMIT 1");
+            $cStmt->execute([':cid' => $churchId]);
+            $row = $cStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+            $church = [
+                'name' => (string)($row['name'] ?? ''),
+                'legal_name' => (string)($row['legal_name'] ?? ''),
+            ];
+        }
+
         $this->view('admin/election_new.php', [
-            'csrf' => $this->services['csrf']->token(),
+            'csrf'   => $this->services['csrf']->token(),
+            'church' => $church,
         ]);
     }
 
@@ -61,6 +75,11 @@ final class ElectionController extends Controller
             throw new RuntimeException('Tipo inválido.');
         }
 
+        $assemblyType = strtoupper((string)$this->request->post('assembly_type', 'ORDINARIA'));
+        if (!in_array($assemblyType, ['ORDINARIA', 'EXTRAORDINARIA'], true)) {
+            $assemblyType = 'ORDINARIA';
+        }
+
         $title = trim((string)$this->request->post('title', ''));
         if ($title === '' || mb_strlen($title) > 190) {
             throw new RuntimeException('Título inválido.');
@@ -74,6 +93,11 @@ final class ElectionController extends Controller
         $expectedVoters = (int)$this->request->post('expected_voters', 0);
         if ($expectedVoters <= 0) {
             throw new RuntimeException('Quantidade de eleitores inválida.');
+        }
+
+        $entityName = trim((string)$this->request->post('entity_name', ''));
+        if ($entityName !== '' && mb_strlen($entityName) > 255) {
+            $entityName = mb_substr($entityName, 0, 255);
         }
 
         $vacancies = null;
@@ -98,13 +122,19 @@ final class ElectionController extends Controller
 
         $pdo->beginTransaction();
         try {
+            if ($entityName !== '') {
+                $pdo->prepare("UPDATE churches SET legal_name = :ln WHERE id = :cid")
+                    ->execute([':ln' => $entityName, ':cid' => $churchId]);
+            }
+
             $insE = $pdo->prepare(
-                "INSERT INTO elections (church_id, type, title, election_date, expected_voters, vacancies, status, public_key, cpf_salt, opened_at)
-                 VALUES (:cid, :type, :title, :dt, :expected, :vacancies, 'OPEN', :pkey, :salt, NOW())"
+                "INSERT INTO elections (church_id, type, assembly_type, title, election_date, expected_voters, vacancies, status, public_key, cpf_salt, opened_at)
+                 VALUES (:cid, :type, :assembly_type, :title, :dt, :expected, :vacancies, 'aberta_para_presenca', :pkey, :salt, NOW())"
             );
             $insE->execute([
                 ':cid' => $churchId,
                 ':type' => $type,
+                ':assembly_type' => $assemblyType,
                 ':title' => $title,
                 ':dt' => $electionDate,
                 ':expected' => $expectedVoters,
@@ -197,9 +227,11 @@ final class ElectionController extends Controller
         $pdo = $this->services['pdo'];
 
         $eStmt = $pdo->prepare(
-            "SELECT id, type, title, election_date, expected_voters, vacancies, status, public_key, cpf_salt
-             FROM elections
-             WHERE id = :id AND church_id = :cid
+            "SELECT e.id, e.type, e.assembly_type, e.title, e.election_date, e.expected_voters, e.vacancies, e.status, e.public_key, e.cpf_salt,
+                    c.name AS church_name, c.legal_name AS church_legal_name
+             FROM elections e
+             INNER JOIN churches c ON c.id = e.church_id
+             WHERE e.id = :id AND e.church_id = :cid
              LIMIT 1"
         );
         $eStmt->execute([':id' => $id, ':cid' => $churchId]);
@@ -207,6 +239,11 @@ final class ElectionController extends Controller
         if (!$election) {
             throw new RuntimeException('Eleição não encontrada.');
         }
+        if (!isset($election['assembly_type']) || $election['assembly_type'] === null || $election['assembly_type'] === '') {
+            $election['assembly_type'] = 'ORDINARIA';
+        }
+        $entityName = (string)(($election['church_legal_name'] ?? '') !== '' ? $election['church_legal_name'] : ($election['church_name'] ?? ''));
+        $election['entity_name'] = $entityName;
 
         $sStmt = $pdo->prepare(
             "SELECT id, number, status, expected_voters, vote_count, opened_at, closed_at
@@ -249,7 +286,7 @@ final class ElectionController extends Controller
         }
 
         $pendingVoters = [];
-        if ($currentScrutinyId && $election['status'] === 'OPEN' && $scrutiniums[0]['status'] === 'OPEN') {
+        if ($currentScrutinyId && in_array($election['status'], ['OPEN', 'aberta_para_presenca', 'aberta_para_votacao'], true) && $scrutiniums[0]['status'] === 'OPEN') {
             // Se for DIRETORIA, o credenciamento dita quem pode votar
             if ($election['type'] === 'DIRETORIA') {
                 $vStmt = $pdo->prepare("SELECT u.id, u.name as full_name, u.cpf FROM users u INNER JOIN election_voters ev ON ev.user_id = u.id WHERE ev.election_id = :eid AND u.role = 'ELEITOR' AND u.approved = 1 AND u.active = 1 ORDER BY u.name ASC");
@@ -662,23 +699,50 @@ final class ElectionController extends Controller
     {
         $this->services['auth']->requireRole(['ADMIN','SUPER_ADMIN']);
         $this->services['csrf']->validate($this->request->post('_csrf'));
-        
+
         $electionId = (int)$this->request->post('election_id', 0);
         $expectedVoters = (int)$this->request->post('expected_voters', 0);
-        
+
         if ($expectedVoters <= 0) {
             throw new RuntimeException('Quantidade de eleitores inválida.');
         }
-        
+
         $pdo = $this->services['pdo'];
-        
+        $churchId = (int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0);
+
+        $eStmt = $pdo->prepare("SELECT id, church_id FROM elections WHERE id = :eid LIMIT 1");
+        $eStmt->execute([':eid' => $electionId]);
+        $electionRow = $eStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$electionRow || (int)$electionRow['church_id'] !== $churchId) {
+            throw new RuntimeException('Eleição não encontrada.');
+        }
+
+        $title = trim((string)$this->request->post('title', ''));
+        if ($title !== '' && mb_strlen($title) <= 190) {
+            $pdo->prepare("UPDATE elections SET title = :title WHERE id = :eid")->execute([':title' => $title, ':eid' => $electionId]);
+        }
+
+        $electionDate = (string)$this->request->post('election_date', '');
+        if ($electionDate !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $electionDate)) {
+            $pdo->prepare("UPDATE elections SET election_date = :dt WHERE id = :eid")->execute([':dt' => $electionDate, ':eid' => $electionId]);
+        }
+
+        $assemblyType = strtoupper((string)$this->request->post('assembly_type', ''));
+        if (in_array($assemblyType, ['ORDINARIA', 'EXTRAORDINARIA'], true)) {
+            $pdo->prepare("UPDATE elections SET assembly_type = :atype WHERE id = :eid")->execute([':atype' => $assemblyType, ':eid' => $electionId]);
+        }
+
+        $legalName = trim((string)$this->request->post('entity_name', ''));
+        if ($legalName !== '' && mb_strlen($legalName) <= 255) {
+            $pdo->prepare("UPDATE churches SET legal_name = :ln WHERE id = :cid")->execute([':ln' => $legalName, ':cid' => $churchId]);
+        }
+
         $stmt = $pdo->prepare("UPDATE elections SET expected_voters = :expected WHERE id = :eid");
         $stmt->execute([':expected' => $expectedVoters, ':eid' => $electionId]);
-        
-        // Também atualizar o expected_voters no escrutínio aberto, para que o fechamento automático funcione com o novo valor
+
         $stmtScrutiny = $pdo->prepare("UPDATE scrutiniums SET expected_voters = :expected WHERE election_id = :eid AND status = 'OPEN'");
         $stmtScrutiny->execute([':expected' => $expectedVoters, ':eid' => $electionId]);
-        
+
         $this->response->redirect('/admin/elections/manage?id=' . $electionId);
     }
 
@@ -699,7 +763,7 @@ final class ElectionController extends Controller
         if (!$election || !in_array($election['type'], ['OFICIAIS', 'DIRETORIA', 'SOCIEDADES'], true)) {
             throw new RuntimeException('Apenas eleições de oficiais, diretoria ou sociedades podem ter múltiplos escrutínios.');
         }
-        if ($election['status'] !== 'OPEN') {
+        if (!in_array($election['status'], ['OPEN', 'aberta_para_presenca', 'aberta_para_votacao'], true)) {
             throw new RuntimeException('A eleição já está encerrada.');
         }
 
@@ -739,7 +803,7 @@ final class ElectionController extends Controller
         $eStmt->execute([':eid' => $electionId]);
         $election = $eStmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$election || ($election['type'] !== 'OFICIAIS' && $election['type'] !== 'DIRETORIA' && $election['type'] !== 'SOCIEDADES') || $election['status'] !== 'OPEN') {
+        if (!$election || ($election['type'] !== 'OFICIAIS' && $election['type'] !== 'DIRETORIA' && $election['type'] !== 'SOCIEDADES') || !in_array($election['status'], ['OPEN', 'aberta_para_presenca', 'aberta_para_votacao'], true)) {
             throw new RuntimeException('Ação inválida para esta eleição.');
         }
 
@@ -798,7 +862,7 @@ final class ElectionController extends Controller
         $electionId = (int)$this->request->post('election_id', 0);
         $pdo = $this->services['pdo'];
         
-        $stmt = $pdo->prepare("UPDATE elections SET status = 'CLOSED', closed_at = NOW() WHERE id = :eid AND status = 'OPEN'");
+        $stmt = $pdo->prepare("UPDATE elections SET status = 'encerrada', closed_at = NOW() WHERE id = :eid AND status IN ('OPEN','aberta_para_presenca','aberta_para_votacao')");
         $stmt->execute([':eid' => $electionId]);
         
         // Encerrar também qualquer escrutínio que tenha ficado aberto

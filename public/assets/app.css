@@ -1115,3 +1115,120 @@ td .row { justify-content: flex-start; }
   text-decoration: none;
 }
 
+/* Botão amarelo/alaranjado (Workflow Presença) */
+.btn--warning {
+  background: #F59E0B;
+  color: #1F2937;
+  border-color: #F59E0B;
+  font-weight: 600;
+}
+.btn--warning:hover {
+  background: #D97706;
+  border-color: #D97706;
+  color: #fff;
+}
+
+/* Botão vermelho (Perigo / Encerrar) */
+.btn--danger {
+  background: var(--brand-danger, #DC2626);
+  color: #fff;
+  border-color: var(--brand-danger, #DC2626);
+}
+.btn--danger:hover {
+  background: #B91C1C;
+  border-color: #B91C1C;
+  color: #fff;
+}
+
+/* Card Tinted (fundo sutil para sub-cards) */
+.card--tinted {
+  background: var(--brand-card-tinted, rgba(249, 250, 251, 0.6));
+  border: 1px solid var(--brand-border);
+  box-shadow: none;
+}
+.card--tinted .card__header { border-color: transparent; }
+
+/* Cols 3/2/1 responsivos (Workflow/Layout) */
+.cols-2, .cols-3 { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 820px) {
+  .cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .cols-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Hint de campo (texto pequeno abaixo do input) */
+.muted.hint, .form-grid .hint, .hint {
+  font-size: 12px;
+  color: var(--brand-muted);
+  display: block;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   Aliases de compatibilidade (classes antigas hífen/legado)
+   Evitam que views antigas quebrem visualmente
+   ============================================================ */
+.btn.secondary, .btn.ghost {
+  background: var(--brand-card, #fff);
+  color: var(--brand-text);
+  border-color: var(--brand-border);
+}
+.btn.secondary:hover, .btn.ghost:hover {
+  background: #F9FAFB;
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+.btn.primary {
+  background: var(--brand-primary, #004AAD);
+  color: #fff;
+  border-color: var(--brand-primary, #004AAD);
+}
+.btn.warn, .btn--warn { background:#F59E0B; color:#1F2937; border-color:#F59E0B; font-weight:600; }
+.btn.warn:hover, .btn--warn:hover { background:#D97706; border-color:#D97706; color:#fff; }
+.btn.danger { background:var(--brand-danger,#DC2626); color:#fff; border-color:var(--brand-danger,#DC2626); }
+.btn.danger:hover { background:#B91C1C; border-color:#B91C1C; color:#fff; }
+.btn.success { background:var(--brand-success,#22C55E); color:#fff; border-color:var(--brand-success,#22C55E); }
+.btn.success:hover { background:#16A34A; border-color:#16A34A; color:#fff; }
+.btn-block { width: 100%; }
+.btn .btn-sm, .btn-sm {
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+/* section-title / box-heading / box-heading / box-* antigos */
+.section-title {
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--brand-border);
+}
+.section-title h2 { margin:0; font-size:18px; color:var(--brand-text); }
+.section-title > span.muted { font-size:13px; color:var(--brand-muted); }
+.box-heading, .card__header + .box-heading { padding:8px 0 4px 0; }
+.box, .box-info, .box-warn, .box-danger, .box-success, .box-soft {
+  border:1px solid var(--brand-border);
+  border-radius: var(--radius-md);
+  background: var(--brand-card, #fff);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.box-info   { border-color: rgba(59,130,246,.22); background: rgba(59,130,246,.04); }
+.box-warn   { border-color: rgba(245,158,11,.22); background: rgba(245,158,11,.04); }
+.box-danger { border-color: rgba(220,38,38,.22);  background: rgba(220,38,38,.04); }
+.box-success{ border-color: rgba(34,197,94,.22);  background: rgba(34,197,94,.04); }
+.box-soft   { background: rgba(148,163,184,.06); }
+
+.card-flat { border:1px solid var(--brand-border); }
+.row.itemRow, .list .row.itemRow {
+  border-top:1px solid var(--brand-border);
+  padding: 8px 4px;
+}
+.big { font-size: 16px; font-weight: 700; color: var(--brand-text); }
+
+/* Footer mini do manage */
+.footer-mini {
+  text-align:center;
+  padding: 18px 10px;
+  color: var(--brand-muted);
+  font-size: 12px;
+}
+

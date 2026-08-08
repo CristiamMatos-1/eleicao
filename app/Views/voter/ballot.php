@@ -32,13 +32,27 @@
       </div>
     <?php endif; ?>
 
+    <?php
+      $assemblyTypeRaw = (string)($election['assembly_type'] ?? 'ORDINARIA');
+      $assemblyType = strtoupper($assemblyTypeRaw) === 'EXTRAORDINARIA' ? 'EXTRAORDINÁRIA' : 'ORDINÁRIA';
+      $entityName   = trim((string)($election['entity_name'] ?? $election['church_legal_name'] ?? $election['church_name'] ?? ''));
+      $rawDate = (string)($election['election_date'] ?? '');
+      if ($rawDate !== '' && $rawDate !== '0000-00-00') {
+          $dt = \DateTime::createFromFormat('Y-m-d', $rawDate);
+          $formattedDate = $dt !== false ? $dt->format('d/m/Y') : '';
+      } else {
+          $formattedDate = '';
+      }
+    ?>
     <div class="ballot-header">
       <div>
-        <div class="ballot-header__label">Assembleia Geral</div>
-        <h1 class="ballot-header__title"><?= htmlspecialchars($election['title'], ENT_QUOTES, 'UTF-8') ?></h1>
+        <div class="ballot-header__label">
+          Assembleia Geral <?= htmlspecialchars($assemblyType, ENT_QUOTES, 'UTF-8') ?><?= $entityName !== '' ? ' do ' . htmlspecialchars($entityName, ENT_QUOTES, 'UTF-8') : '' ?>
+        </div>
+        <h1 class="ballot-header__title"><?= htmlspecialchars((string)($election['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h1>
         <div class="ballot-header__meta">
-          <?= date('d/m/Y', strtotime($election['election_date'])) ?>
-          &nbsp;·&nbsp; Tipo: <?= htmlspecialchars($election['type'], ENT_QUOTES, 'UTF-8') ?>
+          <?php if ($formattedDate !== ''): ?><?= htmlspecialchars($formattedDate, ENT_QUOTES, 'UTF-8') ?>&nbsp;·&nbsp;<?php endif; ?>
+          Tipo: <?= htmlspecialchars((string)($election['type'] ?? ''), ENT_QUOTES, 'UTF-8') ?>
         </div>
       </div>
       <?php if (!empty($myName)): ?>

@@ -63,8 +63,29 @@
             </div>
 
             <div class="form-grid__cell">
+              <label>Natureza da Assembleia</label>
+              <select name="assembly_type" id="assemblyTypeSelect" required>
+                <option value="ORDINARIA" selected>Ordinária</option>
+                <option value="EXTRAORDINARIA">Extraordinária</option>
+              </select>
+            </div>
+
+            <div class="form-grid__cell">
               <label>Data</label>
               <input type="date" name="election_date" required>
+            </div>
+
+            <div class="form-grid__cell form-grid__cell--2">
+              <label>Nome da Entidade / Condomínio (Razão Social)</label>
+              <?php
+                $churchName = (string)($church['name'] ?? '');
+                $legalName  = (string)($church['legal_name'] ?? '');
+                $defaultEntity = $legalName !== '' ? $legalName : $churchName;
+              ?>
+              <input name="entity_name" value="<?= htmlspecialchars($defaultEntity, ENT_QUOTES, 'UTF-8') ?>" maxlength="255" placeholder="Ex: Igreja Batista da Esperança EIRELI - ME">
+              <span class="muted" style="font-size:12px; display:block; margin-top:4px;">
+                Este nome aparecerá no cabeçalho do PDF de Lista de Presença.
+              </span>
             </div>
 
             <div class="form-grid__cell">

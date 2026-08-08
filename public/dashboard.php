@@ -22,61 +22,67 @@ $baseUrl = rtrim((string)($config['app']['base_url'] ?? ''), '/');
     data-public-key="<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>"
     data-base-url="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>"
   >
-    <section class="card toolbar--top" style="margin-bottom:16px; padding:18px 20px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom:14px; flex-wrap: wrap; gap: 12px;">
+    <section class="card toolbar--top" style="margin-bottom:16px;">
+      <div class="card__header">
         <div>
-          <h2 style="margin: 0; color: var(--brand-secondary); font-size:22px;">Apuração ao Vivo</h2>
-          <p class="muted" style="margin:4px 0 0 0;">Resultados atualizados automaticamente a cada 8 segundos</p>
+          <h2 style="margin:0; color: var(--brand-secondary); font-size:22px;">Apuração ao Vivo</h2>
+          <span class="muted" style="font-size:13px;">Resultados atualizados automaticamente a cada 8 segundos</span>
         </div>
-        <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/login" class="link-voltar">
+        <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/login" class="btn btn--secondary btn--sm">
           &larr; Voltar para a Página Principal
         </a>
       </div>
-      <label style="display:block; margin-bottom:8px; font-weight:600; color:var(--brand-text); font-size:14px;">
-        Selecione a Eleição:
-      </label>
-      <select id="electionSelect">
-        <option value="">Carregando eleições…</option>
-      </select>
+      <div style="margin-top:4px;">
+        <label style="display:block; margin-bottom:8px; font-weight:600; color:var(--brand-text); font-size:14px;">
+          Selecione a Eleição:
+        </label>
+        <select id="electionSelect" style="width:100%;">
+          <option value="">Carregando eleições…</option>
+        </select>
+      </div>
     </section>
 
     <?php if ($key !== ''): ?>
-    <header class="ballot-header">
+    <header class="ballot-header" style="margin-bottom:16px;">
       <div>
         <div class="ballot-header__label">Eleição</div>
         <h1 id="title" class="ballot-header__title">Carregando dados…</h1>
       </div>
-      <div class="meta">
-        <span id="status" class="pill">Carregando</span>
-        <span id="scrutiny" class="pill subtle"></span>
+      <div class="meta" style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span id="status" class="pill pill--blue">Carregando</span>
+        <span id="scrutiny" class="pill pill--gray"></span>
       </div>
     </header>
 
-    <section class="grid">
+    <section class="cols-2" style="margin-bottom:16px;">
       <article class="card">
-        <h2>Andamento da Votação</h2>
+        <div class="card__header">
+          <h2 style="margin:0;">Andamento da Votação</h2>
+        </div>
         <div class="kpis">
           <div class="kpi">
-            <div class="kpi-label">Votos</div>
-            <div id="votes" class="kpi-value">0</div>
+            <div class="kpi__label">Votos</div>
+            <div id="votes" class="kpi__value">0</div>
           </div>
           <div class="kpi">
-            <div class="kpi-label">Esperados</div>
-            <div id="expected" class="kpi-value">0</div>
+            <div class="kpi__label">Esperados</div>
+            <div id="expected" class="kpi__value">0</div>
           </div>
           <div class="kpi">
-            <div class="kpi-label">Faltam</div>
-            <div id="remaining" class="kpi-value">0</div>
+            <div class="kpi__label">Faltam</div>
+            <div id="remaining" class="kpi__value">0</div>
           </div>
         </div>
-        <div class="bar" aria-hidden="true">
+        <div class="bar" aria-hidden="true" style="margin-top:14px;">
           <div id="barFill" class="bar-fill" style="width:0%"></div>
         </div>
-        <div id="updatedAt" class="muted">Aguardando primeira atualização…</div>
+        <div id="updatedAt" class="muted" style="margin-top:10px; font-size:12px;">Aguardando primeira atualização…</div>
       </article>
 
       <article class="card">
-        <h2>Resultado Parcial</h2>
+        <div class="card__header">
+          <h2 style="margin:0;">Resultado Parcial</h2>
+        </div>
         <div id="result" class="result">
           <div class="muted" style="padding:16px 4px; text-align:center;">
             Aguardando apuração…
@@ -93,6 +99,10 @@ $baseUrl = rtrim((string)($config['app']['base_url'] ?? ''), '/');
         </a>
       </section>
     <?php endif; ?>
+
+    <div style="text-align:center; padding:18px 10px; color:var(--brand-muted); font-size:12px;">
+      Painel de Apuração Pública · Coninfoms Eleição · <?= date('Y') ?>
+    </div>
   </main>
 
   <script src="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/dashboard.js"></script>

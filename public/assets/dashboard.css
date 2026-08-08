@@ -211,6 +211,62 @@ h2 { margin: 0 0 16px 0; font-size: 20px; font-weight: 700; color: var(--brand-s
   font-variant-numeric: tabular-nums;
 }
 
+/* Aliases BEM novos para KPIs */
+.kpi__label {
+  font-size: 12px;
+  color: var(--brand-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.kpi__value {
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 6px;
+  color: var(--brand-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Card header BEM (estilo novo) */
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--brand-border);
+}
+.card__header h2, .card__header h3, .card__header h4 { margin: 0; }
+
+/* Cols 2/3 responsivos para o layout novo */
+.cols-2, .cols-3 { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 820px) {
+  .cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .cols-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Pills BEM (alias pill__dot) */
+.pill__dot {
+  width: 6px; height: 6px; border-radius: 9999px; background: currentColor;
+  opacity: 0.85; display: inline-block; flex-shrink: 0; margin-right: 6px;
+}
+
+/* Cards aninhados (card within card) sem sombra dupla */
+.card > .card {
+  box-shadow: none;
+  border-color: var(--brand-border);
+}
+
+/* Sobrepor toolbar--top agora que usamos card interno */
+.toolbar--top {
+  background: var(--brand-card);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius-xl);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+}
+
 /* =========== BARRA DE PROGRESSO =========== */
 .bar {
   height: 12px;
@@ -374,15 +430,6 @@ select:focus, input:focus, textarea:focus {
   transition: border-color .15s ease, color .15s ease;
 }
 .link-voltar:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
-
-/* =========== TOOLBAR (seletor de eleição) =========== */
-.toolbar--top {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-  margin-bottom: 16px;
-}
 
 /* Responsividade final: telas muito pequenas */
 @media (max-width: 420px) {

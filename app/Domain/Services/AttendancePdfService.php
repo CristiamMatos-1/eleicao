@@ -26,7 +26,12 @@ final class AttendancePdfService
 
         $pdf->AddPage();
 
-        $this->renderHeader($pdf, $election, count($rows));
+        $entityName = $this->fetchEntityName($election, $churchId);
+        $assemblyType = strtoupper((string)($election['assembly_type'] ?? 'ORDINARIA')) === 'EXTRAORDINARIA'
+            ? 'EXTRAORDINÁRIA'
+            : 'ORDINÁRIA';
+
+        $this->renderHeader($pdf, $election, count($rows), $entityName, $assemblyType);
         $this->renderTableHeader($pdf);
 
         $line = 1;
@@ -37,6 +42,31 @@ final class AttendancePdfService
 
         $title = 'Lista_de_Presenca_' . preg_replace('/[^A-Za-z0-9_-]/', '_', (string)($election['title'] ?? 'lista')) . '.pdf';
         $pdf->Output('D', $title, true);
+    }
+
+    private function fetchEntityName(array $election, int $churchId): string
+    {
+        $fromElection = trim((string)(($election['church_legal_name'] ?? '') !== ''
+            ? $election['church_legal_name']
+            : ($election['entity_name'] ?? ($election['church_name'] ?? ''))));
+        if ($fromElection !== '') {
+            return $fromElection;
+        }
+        try {
+            $stmt = $this->pdo->prepare("SELECT name, legal_name FROM churches WHERE id = :cid LIMIT 1");
+            $stmt->execute([':cid' => $churchId]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+            $legal = trim((string)($row['legal_name'] ?? ''));
+            if ($legal !== '') {
+                return $legal;
+            }
+            $name = trim((string)($row['name'] ?? ''));
+            if ($name !== '') {
+                return $name;
+            }
+        } catch (\Throwable) {
+        }
+        return '';
     }
 
     private function fetchRows(int $churchId, int $electionId): array
@@ -83,12 +113,17 @@ final class AttendancePdfService
         return $base->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    private function renderHeader(FPDF $pdf, array $election, int $totalRows): void
+    private function renderHeader(FPDF $pdf, array $election, int $totalRows, string $entityName, string $assemblyType): void
     {
         $pdf->SetFont('Times', 'B', 14);
         $wAll = $pdf->GetPageWidth() - 40;
 
-        $pdf->Cell($wAll, self::LINE_HEIGHT_MM, utf8_decode('LISTA DE PRESENÇA'), 0, 1, 'C');
+        $pdf->Cell($wAll, self::LINE_HEIGHT_MM, $this->prepareText('LISTA DE PRESENÇA DA ASSEMBLEIA GERAL ' . $assemblyType), 0, 1, 'C');
+
+        if ($entityName !== '') {
+            $pdf->SetFont('Times', 'B', 13);
+            $pdf->MultiCell($wAll, self::LINE_HEIGHT_MM, $this->prepareText('DO ' . $entityName), 0, 'C');
+        }
 
         $title = (string)($election['title'] ?? '');
         if ($title !== '') {
