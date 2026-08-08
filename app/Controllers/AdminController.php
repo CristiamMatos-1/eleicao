@@ -20,6 +20,16 @@ final class AdminController extends Controller
         $settings = $pdo->query("SELECT registration_open FROM registration_settings WHERE id = 1")
             ->fetch(PDO::FETCH_ASSOC);
 
+        $anyAttendanceOpen = false;
+        try {
+            $stmt = $pdo->query(
+                "SELECT COUNT(*) FROM elections WHERE status = 'aberta_para_presenca' LIMIT 1"
+            );
+            $anyAttendanceOpen = (int)$stmt->fetchColumn() > 0;
+        } catch (\Throwable) {
+            $anyAttendanceOpen = false;
+        }
+
         $pending = $pdo->prepare(
             "SELECT id, name, cpf, created_at
              FROM users
@@ -60,7 +70,9 @@ final class AdminController extends Controller
 
         $this->view('admin/home.php', [
             'csrf' => $this->services['csrf']->token(),
-            'registration_open' => (int)($settings['registration_open'] ?? 0) === 1,
+            'registration_open' => ((int)($settings['registration_open'] ?? 0) === 1) || $anyAttendanceOpen,
+            'registration_open_by_flag' => (int)($settings['registration_open'] ?? 0) === 1,
+            'registration_open_by_attendance' => $anyAttendanceOpen,
             'pending' => $pending,
             'approvedElectors' => $approvedElectors,
             'systemUsers' => $systemUsers,

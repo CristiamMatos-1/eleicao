@@ -43,12 +43,19 @@
       </div>
 
       <div class="box">
-        <div class="row">
+        <div class="row" style="align-items:flex-start; flex-wrap:wrap; gap:16px;">
           <div>
             <div class="muted">Cadastros</div>
             <div class="big"><?= $registration_open ? 'Abertos' : 'Fechados' ?></div>
+            <?php if (!empty($registration_open_by_attendance) && empty($registration_open_by_flag)): ?>
+              <div class="muted" style="margin-top:4px;">
+                <span style="padding:2px 8px; border-radius:999px; background:#FFF3CD; color:#856404; font-size:12px;">
+                  Aberto automaticamente · fase de presença
+                </span>
+              </div>
+            <?php endif; ?>
           </div>
-          <div class="row">
+          <div class="row" style="gap:8px;">
             <?php if (!$registration_open): ?>
               <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/registrations/open">
                 <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">

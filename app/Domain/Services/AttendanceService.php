@@ -233,6 +233,17 @@ final class AttendanceService
                 )->execute([':eid' => $electionId]);
             }
 
+            if ($newStatus === self::STATUS_PRESENCA) {
+                try {
+                    $pdo->exec(
+                        "INSERT INTO registration_settings (id, registration_open)
+                         VALUES (1, 1)
+                         ON DUPLICATE KEY UPDATE registration_open = 1"
+                    );
+                } catch (\Throwable) {
+                }
+            }
+
             $pdo->commit();
         } catch (Throwable $e) {
             $pdo->rollBack();

@@ -24,7 +24,19 @@ final class AuthController extends Controller
     {
         $pdo = $this->services['pdo'];
         $settings = $pdo->query("SELECT registration_open FROM registration_settings WHERE id = 1")->fetch(\PDO::FETCH_ASSOC);
-        $isOpen = (int)($settings['registration_open'] ?? 0) === 1;
+        $isOpenFlag = (int)($settings['registration_open'] ?? 0) === 1;
+
+        $anyAttendanceOpen = false;
+        try {
+            $stmt = $pdo->query(
+                "SELECT COUNT(*) FROM elections WHERE status = 'aberta_para_presenca' LIMIT 1"
+            );
+            $anyAttendanceOpen = (int)$stmt->fetchColumn() > 0;
+        } catch (\Throwable) {
+            $anyAttendanceOpen = false;
+        }
+
+        $isOpen = $isOpenFlag || $anyAttendanceOpen;
 
         $churches = $pdo->query("SELECT id, name FROM churches ORDER BY name ASC")->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -41,7 +53,19 @@ final class AuthController extends Controller
         $pdo = $this->services['pdo'];
 
         $settings = $pdo->query("SELECT registration_open FROM registration_settings WHERE id = 1")->fetch(\PDO::FETCH_ASSOC);
-        if ((int)($settings['registration_open'] ?? 0) !== 1) {
+        $isOpenFlag = (int)($settings['registration_open'] ?? 0) === 1;
+
+        $anyAttendanceOpen = false;
+        try {
+            $stmt = $pdo->query(
+                "SELECT COUNT(*) FROM elections WHERE status = 'aberta_para_presenca' LIMIT 1"
+            );
+            $anyAttendanceOpen = (int)$stmt->fetchColumn() > 0;
+        } catch (\Throwable) {
+            $anyAttendanceOpen = false;
+        }
+
+        if (!$isOpenFlag && !$anyAttendanceOpen) {
             throw new RuntimeException('O período de cadastro está encerrado.');
         }
 
