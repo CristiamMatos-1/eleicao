@@ -1,0 +1,31 @@
+; ============================================================
+;  Arquivo de Configuração do Sistema de Eleição (cPanel)
+; ============================================================
+;  1) Copie este arquivo para uma das duas localizações abaixo
+;     (a PRIMEIRA é a MAIS SEGURA porque fica FORA de public_html):
+;
+;      /home2/coninfom/eleicao.ini        <<<< RECOMENDADO
+;      /home2/coninfom/public_html/eleicao/app/Config/eleicao.ini
+;
+;  2) Preencha os valores abaixo obtidos no cPanel > MySQL Databases.
+;
+;  3) NUNCA deixe este arquivo dentro de public_html, pois contém
+;     senhas em texto. A opção RECOMENDADA é a RAIZ da hospedagem.
+; ============================================================
+
+[db]
+; Substitua por seus valores reais do cPanel (formato prefixo_nome):
+dsn  = "mysql:host=localhost;dbname=coninfom_nome_do_banco;charset=utf8mb4"
+user = "coninfom_usuario_mysql"
+pass = "senha_super_segura_do_usuario_mysql"
+
+[security]
+; Crie uma string GRANDE (mínimo 32 chars) e NUNCA a altere após começar a eleição:
+; Dica: use https://www.uuidgenerator.net/ e cole o resultado + chars extras
+cpf_pepper = "COLOQUE_AQUI_UMA_STRING_GRANDE_ALEATORIA_NAO_MUDE_DEPOIS"
+
+[app]
+; Deixe vazio para autodetectar no cPanel, ou preencha ex.: /eleicao
+base_url = ""
+; prod | dev
+env      = "prod"

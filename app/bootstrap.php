@@ -12,6 +12,30 @@ use App\Domain\Services\AttendancePdfService;
 
 $config = require __DIR__ . '/Config/config.php';
 
+$applyIniOverride = static function (array $config): array {
+    $candidates = [
+        dirname(__DIR__, 2) . '/eleicao.ini',
+        __DIR__ . '/Config/eleicao.ini',
+    ];
+    foreach ($candidates as $iniFile) {
+        if (!is_file($iniFile) || !is_readable($iniFile)) {
+            continue;
+        }
+        $ini = parse_ini_file($iniFile, true);
+        if ($ini === false) {
+            continue;
+        }
+        if (isset($ini['db']['dsn']))   $config['db']['dsn']   = (string)$ini['db']['dsn'];
+        if (isset($ini['db']['user']))  $config['db']['user']  = (string)$ini['db']['user'];
+        if (isset($ini['db']['pass']))  $config['db']['pass']  = (string)$ini['db']['pass'];
+        if (isset($ini['security']['cpf_pepper'])) $config['security']['cpf_pepper'] = (string)$ini['security']['cpf_pepper'];
+        if (isset($ini['app']['base_url'])) $config['app']['base_url'] = (string)$ini['app']['base_url'];
+        if (isset($ini['app']['env']))      $config['app']['env']      = (string)$ini['app']['env'];
+    }
+    return $config;
+};
+$config = $applyIniOverride($config);
+
 $resolveBaseUrl = static function (array $config): string {
     $configured = trim((string)($config['app']['base_url'] ?? ''));
     if ($configured !== '' && $configured !== '/') {
