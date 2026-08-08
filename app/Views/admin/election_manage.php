@@ -269,24 +269,24 @@
         $currentScrutinyExpected = !empty($scrutiniums) ? (int)($scrutiniums[0]['expected_voters'] ?? 0) : (int)($election['expected_voters'] ?? 0);
         $quorum = intdiv($currentScrutinyExpected, 2) + 1;
       ?>
-        <div class="card card--tinted" style="margin-bottom:12px; border:1px solid rgba(59,130,246,.18);">
+        <div class="card card--tinted scrutiny-card scrutiny-card--blue">
           <div class="card__header">
-            <h4 style="margin:0;">Apuração do Escrutínio Atual</h4>
+            <h4 class="card__title-sm">Apuração do Escrutínio Atual</h4>
             <span class="pill pill--blue">Quórum: <?= (int)$quorum ?> voto(s)</span>
           </div>
           <div class="cols-2">
             <?php foreach($voteCounts as $vc):
               $isElectedLive = (($vc['name'] ?? '') !== 'BRANCOS' && (int)($vc['votes'] ?? 0) >= $quorum);
             ?>
-              <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 14px; border-radius:10px; background:#fff; box-shadow:0 1px 2px rgba(15,23,42,0.05); border:1px solid var(--brand-border);">
-                <div style="min-width:0;">
-                  <div style="font-weight:700;"><?= htmlspecialchars((string)($vc['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
+              <article class="scrutiny-row <?= $isElectedLive ? 'scrutiny-row--elected' : '' ?>">
+                <div class="scrutiny-row__info">
+                  <div class="scrutiny-row__name"><?= htmlspecialchars((string)($vc['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
                   <?php if($isElectedLive): ?>
-                    <span class="pill pill--green" style="margin-top:4px; font-size:11px;"><span class="pill__dot"></span> ELEITO</span>
+                    <span class="pill pill--green scrutiny-row__badge"><span class="pill__dot" aria-hidden="true"></span> ELEITO</span>
                   <?php endif; ?>
                 </div>
-                <div style="color:var(--brand-primary); font-weight:700; font-size:16px;"><?= (int)($vc['votes'] ?? 0) ?> voto(s)</div>
-              </div>
+                <div class="scrutiny-row__votes"><?= (int)($vc['votes'] ?? 0) ?> voto(s)</div>
+              </article>
             <?php endforeach; ?>
           </div>
         </div>

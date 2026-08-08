@@ -6,14 +6,30 @@ $key = $_GET['key'] ?? '';
 $key = is_string($key) ? $key : '';
 
 $config = require __DIR__ . '/../app/Config/config.php';
-$baseUrl = rtrim((string)($config['app']['base_url'] ?? ''), '/');
+$baseUrlCfg = rtrim((string)($config['app']['base_url'] ?? ''), '/');
+
+$resolveBaseUrl = function () use ($baseUrlCfg): string {
+    if ($baseUrlCfg !== '') {
+        return $baseUrlCfg;
+    }
+    $script = (string)($_SERVER['SCRIPT_NAME'] ?? '');
+    if ($script === '') {
+        return '';
+    }
+    $dir = dirname($script);
+    if ($dir === '.' || $dir === '\\') {
+        $dir = '';
+    }
+    return rtrim($dir, '/\\');
+};
+$baseUrl = $resolveBaseUrl();
 ?>
 <!doctype html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Painel de Apuração — Coninfoms</title>
+  <title>Apuração ao Vivo — Coninfoms</title>
   <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/dashboard.css?v=<?= time() ?>">
 </head>
 <body>
@@ -22,42 +38,40 @@ $baseUrl = rtrim((string)($config['app']['base_url'] ?? ''), '/');
     data-public-key="<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>"
     data-base-url="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>"
   >
-    <section class="card toolbar--top" style="margin-bottom:16px;">
+    <section class="card toolbar--top dashboard__toolbar">
       <div class="card__header">
         <div>
-          <h2 style="margin:0; color: var(--brand-secondary); font-size:22px;">Apuração ao Vivo</h2>
-          <span class="muted" style="font-size:13px;">Resultados atualizados automaticamente a cada 8 segundos</span>
+          <h2 class="card__title">Apuração ao Vivo</h2>
+          <span class="muted card__hint">Resultados atualizados automaticamente a cada 8 segundos</span>
         </div>
-        <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/login" class="btn btn--secondary btn--sm">
+        <a href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/" class="btn btn--secondary btn--sm">
           &larr; Voltar para a Página Principal
         </a>
       </div>
-      <div style="margin-top:4px;">
-        <label style="display:block; margin-bottom:8px; font-weight:600; color:var(--brand-text); font-size:14px;">
-          Selecione a Eleição:
-        </label>
-        <select id="electionSelect" style="width:100%;">
+      <div class="dashboard__select">
+        <label class="form-label">Selecione a Eleição:</label>
+        <select id="electionSelect">
           <option value="">Carregando eleições…</option>
         </select>
       </div>
     </section>
 
     <?php if ($key !== ''): ?>
-    <header class="ballot-header" style="margin-bottom:16px;">
+    <header class="ballot-header dashboard__ballot">
       <div>
         <div class="ballot-header__label">Eleição</div>
         <h1 id="title" class="ballot-header__title">Carregando dados…</h1>
       </div>
-      <div class="meta" style="display:flex; gap:8px; flex-wrap:wrap;">
+      <div class="meta">
         <span id="status" class="pill pill--blue">Carregando</span>
         <span id="scrutiny" class="pill pill--gray"></span>
       </div>
     </header>
 
-    <section class="cols-2" style="margin-bottom:16px;">
+    <section class="cols-2 dashboard__cols">
       <article class="card">
         <div class="card__header">
-          <h2 style="margin:0;">Andamento da Votação</h2>
+          <h2 class="card__title-sm">Andamento da Votação</h2>
         </div>
         <div class="kpis">
           <div class="kpi">
@@ -73,34 +87,34 @@ $baseUrl = rtrim((string)($config['app']['base_url'] ?? ''), '/');
             <div id="remaining" class="kpi__value">0</div>
           </div>
         </div>
-        <div class="bar" aria-hidden="true" style="margin-top:14px;">
+        <div class="bar" aria-hidden="true">
           <div id="barFill" class="bar-fill" style="width:0%"></div>
         </div>
-        <div id="updatedAt" class="muted" style="margin-top:10px; font-size:12px;">Aguardando primeira atualização…</div>
+        <div id="updatedAt" class="muted updated-at">Aguardando primeira atualização…</div>
       </article>
 
       <article class="card">
         <div class="card__header">
-          <h2 style="margin:0;">Resultado Parcial</h2>
+          <h2 class="card__title-sm">Resultado Parcial</h2>
         </div>
         <div id="result" class="result">
-          <div class="muted" style="padding:16px 4px; text-align:center;">
+          <div class="muted result-empty">
             Aguardando apuração…
           </div>
         </div>
       </article>
     </section>
     <?php else: ?>
-      <section class="card" style="text-align:center; padding:44px 20px;">
-        <h2 style="margin:0 0 10px 0; color:var(--brand-secondary);">Bem-vindo ao Painel Público</h2>
-        <p class="muted" style="margin:0 0 18px 0;">Selecione uma eleição acima para visualizar a apuração em tempo real.</p>
-        <a class="btn btn--primary btn--lg" style="justify-content:center; display:inline-flex;" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/login">
+      <section class="card dashboard__empty">
+        <h2 class="card__title center">Bem-vindo ao Painel Público</h2>
+        <p class="muted center">Selecione uma eleição acima para visualizar a apuração em tempo real.</p>
+        <a class="btn btn--primary btn--lg dashboard__cta" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/">
           Acessar o Sistema de Votação →
         </a>
       </section>
     <?php endif; ?>
 
-    <div style="text-align:center; padding:18px 10px; color:var(--brand-muted); font-size:12px;">
+    <div class="app-footer">
       Painel de Apuração Pública · Coninfoms Eleição · <?= date('Y') ?>
     </div>
   </main>

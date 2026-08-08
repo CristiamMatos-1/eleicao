@@ -431,10 +431,104 @@ select:focus, input:focus, textarea:focus {
 }
 .link-voltar:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
 
+/* =========================================================
+   NOVAS CLASSES BEM — Dashboard Apuração ao Vivo (padrão)
+   ========================================================= */
+
+/* Card titles (padrão novo) */
+.card__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--brand-secondary);
+  line-height: 1.25;
+}
+.card__title-sm {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--brand-secondary);
+  line-height: 1.3;
+}
+.card__hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--brand-muted);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Form label padrão */
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--brand-text);
+  font-size: 14px;
+}
+
+/* Dashboard apuração: blocos com espaçamento uniforme */
+.dashboard__toolbar { margin-bottom: 16px; }
+.dashboard__toolbar .dashboard__select { margin-top: 4px; }
+.dashboard__toolbar select {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  background: var(--brand-card);
+  color: var(--brand-text);
+  border: 1px solid var(--brand-border);
+  font-size: 16px;
+  font-weight: 500;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='%236B7280'><path d='M5.5 7.5L10 12l4.5-4.5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 46px;
+}
+.dashboard__ballot { margin-bottom: 16px; }
+.dashboard__cols { margin-bottom: 16px; }
+
+/* Bar + updated-at (removidos inline style margin-top) */
+.bar { margin-top: 14px; }
+.updated-at { margin-top: 10px; font-size: 12px; }
+
+/* Resultado vazio inicial */
+.result-empty {
+  padding: 16px 4px;
+  text-align: center;
+}
+
+/* Dashboard vazio / boas-vindas */
+.dashboard__empty {
+  text-align: center;
+  padding: 44px 20px;
+}
+.dashboard__empty .center { text-align: center; }
+.dashboard__cta {
+  justify-content: center;
+  display: inline-flex;
+  margin-top: 6px;
+}
+
+/* Footer institucional (padrão novo) */
+.app-footer {
+  text-align: center;
+  padding: 18px 10px;
+  color: var(--brand-muted);
+  font-size: 12px;
+}
+
+/* Helper: texto centralizado */
+.center { text-align: center; }
+
 /* Responsividade final: telas muito pequenas */
 @media (max-width: 420px) {
   .kpi-value { font-size: 24px; }
+  .kpi__value { font-size: 24px; }
   h1 { font-size: 22px; }
   .ballot-header__title { font-size: 22px; }
   .card { padding: 20px 18px; }
+  .card__title { font-size: 20px; }
+  .dashboard__empty { padding: 36px 16px; }
 }

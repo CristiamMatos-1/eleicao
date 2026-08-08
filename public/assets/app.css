@@ -1232,3 +1232,91 @@ td .row { justify-content: flex-start; }
   font-size: 12px;
 }
 
+/* ========================================================
+   CLASSES NOVAS BEM — Padrão gerenciar assembleia e apuração
+   ======================================================== */
+
+.card__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--brand-secondary, #111827);
+  line-height: 1.25;
+}
+.card__title-sm {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--brand-secondary, #111827);
+  line-height: 1.3;
+}
+.card__hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--brand-muted, #6B7280);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--brand-text, #1F2937);
+  font-size: 14px;
+}
+
+.center { text-align: center; }
+
+.app-footer {
+  text-align: center;
+  padding: 18px 10px;
+  color: var(--brand-muted, #6B7280);
+  font-size: 12px;
+}
+
+/* Card da apuração do escrutínio atual (admin manage) */
+.scrutiny-card { margin-bottom: 12px; }
+.scrutiny-card--blue {
+  border: 1px solid rgba(59,130,246,.18);
+}
+.scrutiny-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md, 10px);
+  background: var(--brand-card, #fff);
+  box-shadow: var(--shadow-xs, 0 1px 2px rgba(15,23,42,0.05));
+  border: 1px solid var(--brand-border, #E5E7EB);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.scrutiny-row:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(6, 47, 59, 0.06));
+  border-color: rgba(59,130,246,.22);
+}
+.scrutiny-row--elected {
+  border-color: rgba(34,197,94,.34);
+  background: linear-gradient(180deg, rgba(34,197,94,0.05) 0%, var(--brand-card,#fff) 100%);
+}
+.scrutiny-row__info { min-width: 0; flex: 1; }
+.scrutiny-row__name {
+  font-weight: 700;
+  color: var(--brand-text, #1F2937);
+}
+.scrutiny-row__badge {
+  margin-top: 4px;
+  font-size: 11px;
+}
+.scrutiny-row__votes {
+  color: var(--brand-primary, #004AAD);
+  font-weight: 800;
+  font-size: 16px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
