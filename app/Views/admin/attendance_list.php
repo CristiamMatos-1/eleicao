@@ -13,74 +13,98 @@
     $navLinks = [
       ['label' => 'Voltar', 'href' => $baseUrl . '/admin/elections/manage?id=' . (int)$election['id']],
     ];
+    $activePath = '/admin/elections';
     ob_start();
   ?>
-  <div style="display:flex; gap:8px; flex-wrap:wrap;">
-    <a
-      class="secondary"
-      style="padding:10px 14px; display:inline-block; text-decoration:none; border-radius:8px;"
-      href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance/pdf?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>"
-    >
-      Exportar / Imprimir PDF
-    </a>
-    <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/attendance/register" style="display:inline-flex; gap:8px; flex-wrap:wrap; align-items:flex-end;">
-      <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '', ENT_QUOTES, 'UTF-8') ?>">
-      <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
-      <div>
-        <label style="display:block; font-size:12px; color:var(--muted); margin-bottom:4px;">CPF</label>
-        <input type="text" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" style="min-width:180px;">
-      </div>
-      <div>
-        <label style="display:block; font-size:12px; color:var(--muted); margin-bottom:4px;">Nome (opcional)</label>
-        <input type="text" name="nome" placeholder="Nome completo" style="min-width:240px;">
-      </div>
-      <button type="submit" style="white-space:nowrap;">Registrar Presença</button>
-    </form>
-  </div>
+  <a
+    class="btn btn--secondary"
+    href="<?= htmlspecialchars($baseUrl . '/admin/elections/attendance/pdf?id=' . (int)$election['id'], ENT_QUOTES, 'UTF-8') ?>"
+  >
+    Exportar / Imprimir PDF
+  </a>
   <?php
     $navActions = (string)ob_get_clean();
     require $this->services['config']['app']['base_path'] . '/app/Views/partials/top_nav.php';
   ?>
 
   <main class="wrap">
-    <section class="card">
-      <div class="row" style="align-items:flex-start;">
-        <div>
-          <h1>Lista de Presença</h1>
-          <div class="muted" style="margin-top:4px;">
-            <?= htmlspecialchars($election['title'], ENT_QUOTES, 'UTF-8') ?>
-            | Data: <?= date('d/m/Y', strtotime($election['election_date'])) ?>
-            | Tipo: <?= htmlspecialchars($election['type'], ENT_QUOTES, 'UTF-8') ?>
-          </div>
+    <?php if (!empty($flashMsg)): ?>
+      <div class="alert <?= !empty($flashType) && $flashType === 'success' ? 'alert--success' : 'alert--info' ?>">
+        <?= htmlspecialchars((string)$flashMsg, ENT_QUOTES, 'UTF-8') ?>
+      </div>
+    <?php endif; ?>
+
+    <div class="toolbar">
+      <div class="page-title">
+        <h1>Lista de Presença</h1>
+        <p class="muted" style="margin-top:2px;">
+          <?= htmlspecialchars($election['title'], ENT_QUOTES, 'UTF-8') ?>
+          &nbsp;·&nbsp; Data: <?= date('d/m/Y', strtotime($election['election_date'])) ?>
+          &nbsp;·&nbsp; Tipo: <?= htmlspecialchars($election['type'], ENT_QUOTES, 'UTF-8') ?>
+        </p>
+      </div>
+      <div class="page-actions">
+        <?php
+          $status = (string)($election['status'] ?? '');
+          $statusMap = [
+            'aberta_para_presenca' => ['Aberta para Presença', 'pill--amber'],
+            'aberta_para_votacao'  => ['Aberta para Votação',  'pill--green'],
+            'encerrada'            => ['Encerrada',             'pill--red'],
+            'OPEN'                 => ['Aberta (Legado)',       'pill--teal'],
+            'CLOSED'               => ['Encerrada (Legado)',    'pill--red'],
+          ];
+          $statusInfo = $statusMap[$status] ?? null;
+        ?>
+        <?php if ($statusInfo): ?>
+          <span class="pill <?= $statusInfo[1] ?>"><?= $statusInfo[0] ?></span>
+        <?php endif; ?>
+      </div>
+    </div>
+
+    <?php if (isset($presentCount)): ?>
+      <div class="cols-2 cols--kpi" style="margin-bottom:18px;">
+        <div class="kpi">
+          <div class="kpi__label">Presenças Registradas</div>
+          <div class="kpi__value" style="color:var(--brand-success);"><?= (int)$presentCount ?></div>
+          <div class="kpi__hint">Eleitores com presença confirmada</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi__label">Eleitores Habilitados</div>
+          <div class="kpi__value" style="color:var(--brand-primary);"><?= count($voters) ?></div>
+          <div class="kpi__hint">Total de eleitores cadastrados</div>
         </div>
       </div>
+    <?php endif; ?>
 
-      <?php
-        $status = (string)($election['status'] ?? '');
-        $statusLabel = [
-          'aberta_para_presenca' => ['Aberta para Presença', 'background:#FFF3CD; color:#856404;'],
-          'aberta_para_votacao'  => ['Aberta para Votação', 'background:#D4EDDA; color:#155724;'],
-          'encerrada'            => ['Encerrada',          'background:#F8D7DA; color:#721C24;'],
-          'OPEN'                 => ['Aberta (Legado)',     'background:#D1ECF1; color:#0C5460;'],
-          'CLOSED'               => ['Encerrada (Legado)',  'background:#F8D7DA; color:#721C24;'],
-        ][$status] ?? ['Status', ''];
-      ?>
-      <?php if ($statusLabel[0] !== 'Status'): ?>
-        <div class="pill" style="<?= $statusLabel[1] ?> border:1px solid transparent; padding:8px 12px; border-radius:999px; display:inline-block; margin:10px 0;">
-          Status: <?= htmlspecialchars($statusLabel[0], ENT_QUOTES, 'UTF-8') ?>
+    <div class="card" style="margin-bottom:18px;">
+      <div class="card__header">
+        <h3>Registrar Presença Rapidamente</h3>
+        <span class="muted">Informe CPF e/ou nome para credenciar um eleitor</span>
+      </div>
+      <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/attendance/register" class="form-grid g-4">
+        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf ?? '', ENT_QUOTES, 'UTF-8') ?>">
+        <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
+        <div class="form-grid__cell">
+          <label for="cpf_reg">CPF</label>
+          <input id="cpf_reg" type="text" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" data-mask="cpf">
         </div>
-      <?php endif; ?>
-
-      <?php if (isset($presentCount) && $presentCount > 0): ?>
-        <div style="margin:10px 0 20px 0;">
-          <strong>Presenças registradas:</strong> <?= (int)$presentCount ?>
-          &nbsp;|&nbsp;
-          <strong>Total de eleitores habilitados:</strong> <?= count($voters) ?>
+        <div class="form-grid__cell form-grid__cell--2">
+          <label for="nome_reg">Nome (opcional)</label>
+          <input id="nome_reg" type="text" name="nome" placeholder="Nome completo do eleitor">
         </div>
-      <?php endif; ?>
+        <div class="form-grid__cell" style="display:flex; align-items:flex-end;">
+          <button type="submit" class="btn btn--primary" style="width:100%;">Registrar Presença</button>
+        </div>
+      </form>
+    </div>
 
-      <div style="overflow-x:auto;">
-        <table>
+    <div class="card">
+      <div class="card__header">
+        <h3>Relação de Eleitores</h3>
+        <span class="muted"><?= count($voters) ?> registro(s)</span>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
           <thead>
             <tr>
               <th style="width:5%; text-align:center;">#</th>
@@ -93,7 +117,9 @@
           <tbody>
             <?php if (empty($voters)): ?>
               <tr>
-                <td colspan="5" style="text-align: center; padding:20px;">Nenhum eleitor habilitado para esta eleição.</td>
+                <td colspan="5" style="text-align: center; padding:28px 16px; color:var(--brand-muted);">
+                  Nenhum eleitor habilitado para esta eleição.
+                </td>
               </tr>
             <?php else: ?>
               <?php foreach ($voters as $index => $v): ?>
@@ -109,14 +135,14 @@
                   $present = !empty($v['presente']);
                 ?>
                 <tr>
-                  <td style="text-align:center;"><?= $index + 1 ?></td>
-                  <td><?= htmlspecialchars((string)($v['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td>
-                  <td><?= $cpfFmt ?></td>
+                  <td style="text-align:center; color:var(--brand-muted);"><?= $index + 1 ?></td>
+                  <td style="font-weight:500;"><?= htmlspecialchars((string)($v['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td>
+                  <td style="font-variant-numeric: tabular-nums;"><?= $cpfFmt ?></td>
                   <td style="text-align:center;">
                     <?php if ($present): ?>
-                      <span style="display:inline-block; padding:4px 10px; border-radius:999px; background:#D4EDDA; color:#155724; font-weight:600;">Presente</span>
+                      <span class="pill pill--green">Presente</span>
                     <?php else: ?>
-                      <span style="display:inline-block; padding:4px 10px; border-radius:999px; background:#E9ECEF; color:#495057;">Ausente</span>
+                      <span class="pill pill--gray">Ausente</span>
                     <?php endif; ?>
                   </td>
                   <td style="text-align:center;">
@@ -127,7 +153,9 @@
                         <input type="hidden" name="user_id" value="<?= (int)($v['id'] ?? 0) ?>">
                         <input type="hidden" name="cpf" value="<?= htmlspecialchars($cpf, ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="nome" value="<?= htmlspecialchars((string)($v['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
-                        <button type="submit" class="secondary" style="padding:6px 12px; font-size:14px;">Confirmar</button>
+                        <button type="submit" class="btn btn--primary btn--sm" data-confirm="Confirmar presença de <?= htmlspecialchars((string)($v['name'] ?? 'este eleitor'), ENT_QUOTES, 'UTF-8') ?>?">
+                          Confirmar
+                        </button>
                       </form>
                     <?php endif; ?>
                   </td>
@@ -138,15 +166,24 @@
         </table>
       </div>
 
-      <div style="margin-top:24px; padding:16px; border:1px solid var(--border); border-radius:12px; background:var(--bg);">
-        <div style="font-weight:600; margin-bottom:8px;">Legenda do Workflow</div>
-        <div style="display:grid; gap:8px;">
-          <div><strong>aberta_para_presença</strong> — Eleitores/administradores podem confirmar presença. Voto bloqueado.</div>
-          <div><strong>aberta_para_votação</strong> — Presença confirmada habilita o voto (backend valida presença obrigatória).</div>
-          <div><strong>encerrada</strong> — Nenhuma ação permitida; resultados e relatórios finais.</div>
+      <div style="margin-top:24px; padding:18px 20px; border:1px solid var(--brand-border); border-radius:var(--radius-lg); background:var(--brand-surface);">
+        <div style="font-weight:600; margin-bottom:10px; color:var(--brand-text);">Legenda do Workflow</div>
+        <div class="cols-3" style="gap:14px;">
+          <div class="workflow-banner wf--presence" style="margin:0; padding:12px 14px;">
+            <strong style="display:block; margin-bottom:2px;">Fase de Presença</strong>
+            <span class="muted" style="font-size:13px;">Eleitores/administradores confirmam presença. Voto bloqueado.</span>
+          </div>
+          <div class="workflow-banner wf--voting" style="margin:0; padding:12px 14px;">
+            <strong style="display:block; margin-bottom:2px;">Fase de Votação</strong>
+            <span class="muted" style="font-size:13px;">Presença confirmada habilita o voto (backend valida).</span>
+          </div>
+          <div class="workflow-banner wf--closed" style="margin:0; padding:12px 14px;">
+            <strong style="display:block; margin-bottom:2px;">Encerrada</strong>
+            <span class="muted" style="font-size:13px;">Nenhuma ação permitida; relatórios e resultados finais.</span>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   </main>
   <script src="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.js"></script>
 </body>

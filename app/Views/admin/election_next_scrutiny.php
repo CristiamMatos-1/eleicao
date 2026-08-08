@@ -14,38 +14,113 @@
       ['label' => 'Início', 'href' => $baseUrl . '/admin'],
       ['label' => 'Gerenciar eleição', 'href' => $baseUrl . '/admin/elections/manage?id=' . (int)$election['id']],
     ];
+    $activePath = '/admin/elections';
     $navActions = '';
     require $this->services['config']['app']['base_path'] . '/app/Views/partials/top_nav.php';
   ?>
   <main class="wrap">
-    <section class="card">
-      <div class="row">
+    <div class="toolbar">
+      <div class="page-title">
         <h1>Abrir Próximo Escrutínio</h1>
-        <a class="link" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/manage?id=<?= (int)$election['id'] ?>">Cancelar</a>
+        <p class="muted" style="margin-top:2px;">
+          <?= htmlspecialchars($election['title'], ENT_QUOTES, 'UTF-8') ?>
+        </p>
       </div>
+      <div class="page-actions">
+        <a class="btn btn--secondary" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/manage?id=<?= (int)$election['id'] ?>">
+          ← Cancelar
+        </a>
+      </div>
+    </div>
 
-      <p class="muted">Selecione os candidatos que irão concorrer no próximo escrutínio. Os candidatos não selecionados serão desclassificados (ELIMINATED).</p>
+    <div class="alert alert--warn" style="margin-bottom:18px;">
+      <strong>Atenção:</strong> Selecione apenas os candidatos que <strong>permanecem</strong> disputando no próximo escrutínio.
+      Candidatos <strong>NÃO selecionados</strong> serão automaticamente desclassificados (ELIMINATED) e não poderão mais receber votos.
+    </div>
 
-      <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/scrutiny/next" class="form" style="margin-top:20px;">
-        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
-        <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
+    <form method="post" action="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/scrutiny/next">
+      <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
+      <input type="hidden" name="election_id" value="<?= (int)$election['id'] ?>">
 
-        <div class="list">
-          <?php foreach ($candidates as $c): ?>
-            <label class="item" style="cursor:pointer; display:flex; align-items:center;">
-              <input type="checkbox" name="candidate_ids[]" value="<?= (int)$c['id'] ?>" style="width:auto; flex-shrink:0; margin-right:10px;" checked>
-              <span style="font-weight:500; font-size:16px; word-break:break-word; flex:1; line-height:1.2;"><?= htmlspecialchars($c['full_name'], ENT_QUOTES, 'UTF-8') ?></span>
-            </label>
-          <?php endforeach; ?>
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card__header">
+          <h3 style="margin:0;">Candidatos para o Próximo Escrutínio</h3>
+          <span class="pill pill--amber">
+            Todos estão marcados — desmarque quem deve ser eliminado
+          </span>
         </div>
 
         <?php if (empty($candidates)): ?>
-          <div class="muted">Nenhum candidato ativo disponível para o próximo escrutínio.</div>
+          <div style="text-align:center; padding:36px 16px; color:var(--brand-muted);">
+            Nenhum candidato ativo disponível para o próximo escrutínio.
+          </div>
+        <?php else: ?>
+          <div style="display:grid; grid-template-columns:1fr; gap:10px;">
+            <?php foreach ($candidates as $c): ?>
+              <label class="candidate-card" style="cursor:pointer; display:flex; align-items:center; gap:14px; padding:14px 16px;">
+                <input
+                  type="checkbox"
+                  name="candidate_ids[]"
+                  value="<?= (int)$c['id'] ?>"
+                  class="candidate-cb"
+                  checked
+                  style="width:22px; height:22px; flex-shrink:0; accent-color:var(--brand-primary);"
+                >
+                <?php if (!empty($c['photo_path'])): ?>
+                  <img
+                    class="candidate-photo candidate-photo--md"
+                    src="<?= htmlspecialchars($baseUrl . '/' . ltrim($c['photo_path'], '/'), ENT_QUOTES, 'UTF-8') ?>"
+                    alt="Foto de <?= htmlspecialchars($c['full_name'], ENT_QUOTES, 'UTF-8') ?>"
+                  >
+                <?php else: ?>
+                  <div class="candidate-photo candidate-photo--md">
+                    <?php
+                      $fn = trim((string)($c['full_name'] ?? ''));
+                      $ini = '';
+                      if ($fn !== '') {
+                          $p = preg_split('/\s+/', $fn);
+                          if (count($p) >= 1) $ini .= mb_strtoupper(mb_substr($p[0], 0, 1));
+                          if (count($p) >= 2) $ini .= mb_strtoupper(mb_substr($p[count($p) - 1], 0, 1));
+                      }
+                      echo htmlspecialchars($ini ?: 'SF', ENT_QUOTES, 'UTF-8');
+                    ?>
+                  </div>
+                <?php endif; ?>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-weight:600; color:var(--brand-text); font-size:16px; line-height:1.25;">
+                    <?= htmlspecialchars($c['full_name'], ENT_QUOTES, 'UTF-8') ?>
+                  </div>
+                  <?php if (!empty($c['role_title'])): ?>
+                    <div class="muted" style="font-size:13px; margin-top:2px;">
+                      <?= htmlspecialchars($c['role_title'], ENT_QUOTES, 'UTF-8') ?>
+                    </div>
+                  <?php endif; ?>
+                </div>
+                <span class="pill pill--blue">Permanece</span>
+              </label>
+            <?php endforeach; ?>
+          </div>
         <?php endif; ?>
+      </div>
 
-        <button type="submit" style="margin-top:20px;">Abrir Novo Escrutínio</button>
-      </form>
-    </section>
+      <?php if (!empty($candidates)): ?>
+        <div class="card">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <button
+              type="submit"
+              class="btn btn--primary btn--lg"
+              data-confirm="Confirma os candidatos selecionados para o próximo escrutínio? Os não selecionados serão ELIMINADOS permanentemente desta eleição."
+              style="width:100%;"
+            >
+              Abrir Novo Escrutínio →
+            </button>
+            <a class="btn btn--secondary" style="width:100%; text-align:center; justify-content:center;" href="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/admin/elections/manage?id=<?= (int)$election['id'] ?>">
+              Cancelar
+            </a>
+          </div>
+        </div>
+      <?php endif; ?>
+    </form>
   </main>
   <script src="<?= htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8') ?>/assets/app.js"></script>
 </body>

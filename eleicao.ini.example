@@ -29,3 +29,24 @@ cpf_pepper = "COLOQUE_AQUI_UMA_STRING_GRANDE_ALEATORIA_NAO_MUDE_DEPOIS"
 base_url = ""
 ; prod | dev
 env      = "prod"
+
+; ============================================================
+;  [Opcional] Deploy automático via GitHub (sem Git Version Control)
+; ============================================================
+;  1) Configure uma chave FORTE (40+ chars) aqui. Como este arquivo
+;     está bloqueado no .gitignore, ela NUNCA é commitada.
+;  2) Deploy manual por URL:
+;        https://seusite.com.br/eleicao/deploy.php?key=VALOR_DA_KEY
+;  3) Deploy AUTOMÁTICO (webhook):
+;     GitHub → Repo → Settings → Webhooks → Add webhook
+;        Payload URL:  https://seusite.com.br/eleicao/deploy.php?key=VALOR_DA_KEY&github=1
+;        Content-type: application/json
+;        Which events: Just the push event
+;        Active:       ✓
+
+[deploy]
+key     = "TroqueEstaSenhaPorUmaMuitoForteCom40CaracteresOuMais_AbC123!"
+branch  = "main"
+; "1" = habilita webhook automático via GitHub, "0" = só aceita deploy manual por URL
+webhook = "1"
+

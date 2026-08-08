@@ -1,41 +1,117 @@
 :root {
-  --bg: #F5F5F7;
-  --card: #FFFFFF;
-  --text: #212529;
-  --muted: #6C757D;
-  --accent: #0D6EFD;
-  --ok: #198754;
-  --warn: #FFC107;
-  --danger: #DC3545;
-  --border: #E9ECEF;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  /* Paleta Coninfoms extraída de coninfoms.com.br/cm1 */
+  --brand-primary: #004AAD;
+  --brand-primary-700: #1d4ed8;
+  --brand-secondary: #111827;
+  --brand-surface: #F9FAFB;
+  --brand-card: #FFFFFF;
+  --brand-text: #1F2937;
+  --brand-muted: #6B7280;
+  --brand-border: #E5E7EB;
+  --brand-link: #004AAD;
+  --brand-soft: #DBEAFE;
+  --brand-success: #22C55E;
+  --brand-danger: #DC2626;
+  --brand-warn: #F59E0B;
+  --brand-info: #2CA77F;
+
+  /* Layout tokens inspirados no ipccgv3 */
+  --radius-sm: 6px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --shadow-md: 0 6px 16px rgba(6, 47, 59, 0.09);
+  --shadow-sm: 0 2px 8px rgba(6, 47, 59, 0.04);
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Variáveis legadas (mantidas para não quebrar dashboard.js / selectores antigos) */
+  --bg: var(--brand-surface);
+  --card: var(--brand-card);
+  --text: var(--brand-text);
+  --muted: var(--brand-muted);
+  --accent: var(--brand-primary);
+  --ok: var(--brand-success);
+  --warn: var(--brand-warn);
+  --danger: var(--brand-danger);
+  --border: var(--brand-border);
+  --shadow: var(--shadow-md);
 }
 
 * { box-sizing: border-box; }
 
-body {
+html, body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--brand-surface);
+  color: var(--brand-text);
   font-size: 16px;
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .wrap {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 24px 16px 60px 16px;
 }
 
+/* =========== CARD (ipccgv3 radius-xl + shadow-md) =========== */
 .card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  background: var(--brand-card);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius-xl);
   padding: 24px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-sm);
+}
+.card + .card { margin-top: 0; }
+
+/* =========== HEADER gradiente (ballot-header estilo) =========== */
+.ballot-header {
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-700) 60%, #2563EB 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-xl);
+  padding: 26px 26px 24px 26px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ballot-header__label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2px;
+}
+.ballot-header__title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+.ballot-header__meta {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 6px;
 }
 
+@media (min-width: 720px) {
+  .ballot-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+}
+
+/* =========== GRID =========== */
 .grid {
   display: grid;
   gap: 20px;
@@ -46,98 +122,272 @@ body {
   .grid { grid-template-columns: 1fr 1fr; }
 }
 
-h1 { margin: 0 0 12px 0; font-size: 26px; font-weight: 700; color: #111827; }
-h2 { margin: 0 0 16px 0; font-size: 20px; font-weight: 600; color: #111827; }
+/* =========== HEADINGS =========== */
+h1 { margin: 0 0 12px 0; font-size: 26px; font-weight: 800; color: var(--brand-secondary); }
+h2 { margin: 0 0 16px 0; font-size: 20px; font-weight: 700; color: var(--brand-secondary); }
 
-.meta { display: flex; gap: 12px; flex-wrap: wrap; }
+.meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
+/* =========== PILLS (cores coninfoms) =========== */
 .pill {
   display: inline-flex;
   align-items: center;
-  padding: 8px 14px;
+  padding: 7px 14px;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: #F8F9FA;
-  font-size: 14px;
-  font-weight: 500;
-  color: #495057;
+  border: 1px solid var(--brand-border);
+  background: var(--brand-surface);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-text);
+  white-space: nowrap;
 }
 .pill.subtle {
-  color: var(--muted);
-  background: transparent;
-  border-color: transparent;
-  padding: 0;
+  color: rgba(255,255,255,.9);
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.2);
+  padding: 7px 14px;
 }
 
+/* Pills no header gradiente — fundo branco transparente */
+.ballot-header .pill {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Status Pills coloridos (usados pelo dashboard.js via textContent) */
+#status.pill { font-weight: 700; }
+
+/* Base + cores para cada status detectado por texto (via atributo data-status se disponível, senão por conteúdo) */
+.pill--amber { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+.pill--green { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
+.pill--red   { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+.pill--teal  { background: #CCFBF1; color: #115E59; border-color: #99F6E4; }
+.pill--blue  { background: var(--brand-soft); color: #1E3A8A; border-color: #BFDBFE; }
+.pill--gray  { background: #F3F4F6; color: #374151; border-color: #E5E7EB; }
+
+/* =========== KPIs =========== */
 .kpis {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 14px;
   margin: 20px 0;
+}
+@media (max-width: 520px) {
+  .kpis { grid-template-columns: 1fr; }
 }
 
 .kpi {
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  padding: 18px 14px;
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius-lg);
+  background: var(--brand-card);
+  box-shadow: var(--shadow-sm);
   text-align: center;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.kpi:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .kpi-label {
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 600;
+  font-size: 12px;
+  color: var(--brand-muted);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .kpi-value {
   font-size: 28px;
   font-weight: 800;
-  margin-top: 8px;
-  color: #111827;
+  margin-top: 6px;
+  color: var(--brand-primary);
+  font-variant-numeric: tabular-nums;
 }
 
+/* =========== BARRA DE PROGRESSO =========== */
 .bar {
   height: 12px;
   border-radius: 999px;
-  background: #E9ECEF;
+  background: var(--brand-border);
   overflow: hidden;
 }
-
 .bar-fill {
   height: 100%;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--brand-primary) 0%, var(--brand-primary-700) 100%);
   width: 0%;
   border-radius: 999px;
   transition: width 1s ease-out;
 }
 
-.muted { margin-top: 12px; font-size: 14px; color: var(--muted); }
+.muted { margin-top: 12px; font-size: 14px; color: var(--brand-muted); }
 
-.result { display: flex; flex-direction: column; gap: 12px; }
+/* =========== RESULTADO =========== */
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 16px 20px;
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  background: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--brand-border);
+  background: var(--brand-card);
+  box-shadow: var(--shadow-sm);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.row:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--brand-soft);
+}
+
+.row__name {
+  font-weight: 600;
+  color: var(--brand-text);
+  font-size: 15px;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+.row__meta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.row__pct {
+  font-weight: 800;
+  color: var(--brand-primary);
+  font-variant-numeric: tabular-nums;
+  min-width: 56px;
+  text-align: right;
+  font-size: 15px;
 }
 
 .badge {
   padding: 6px 12px;
   border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  white-space: nowrap;
 }
 
-.badge.ok { background: #D1E7DD; color: #0F5132; border: 1px solid #BADBCC; }
-.badge.warn { background: #FFF3CD; color: #664D03; border: 1px solid #FFECB5; }
-.badge.danger { background: #F8D7DA; color: #842029; border: 1px solid #F5C2C7; }
+.badge.ok { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+.badge.warn { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+.badge.danger { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+
+/* =========== SELECT / COMBO BOX =========== */
+select, input[type="text"], input[type="number"], input[type="date"], input[type="email"], input[type="password"], textarea {
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--brand-text);
+  background: var(--brand-card);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  line-height: 1.4;
+  width: 100%;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  outline: none;
+}
+select:focus, input:focus, textarea:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.10);
+}
+
+#electionSelect {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  background: var(--brand-card);
+  color: var(--brand-text);
+  border: 1px solid var(--brand-border);
+  font-size: 16px;
+  font-weight: 500;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='%236B7280'><path d='M5.5 7.5L10 12l4.5-4.5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 46px;
+}
+
+/* =========== BOTÕES / LINKS (topo do dashboard) =========== */
+.btn, a.btn-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  line-height: 1.25;
+  transition: transform .08s ease, background .15s ease, border-color .15s ease, color .15s ease;
+  white-space: nowrap;
+}
+.btn--primary {
+  background: var(--brand-primary);
+  color: #fff;
+  border-color: var(--brand-primary);
+}
+.btn--primary:hover { background: var(--brand-primary-700); border-color: var(--brand-primary-700); }
+.btn--secondary {
+  background: var(--brand-card);
+  color: var(--brand-text);
+  border-color: var(--brand-border);
+}
+.btn--secondary:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+.btn--sm { padding: 8px 12px; font-size: 13px; }
+.btn--lg { padding: 14px 20px; font-size: 15px; border-radius: var(--radius-lg); }
+
+/* Link "Voltar" do header do dashboard.php (antigo estilo inline) */
+.link-voltar {
+  padding: 10px 16px;
+  background: var(--brand-card);
+  color: var(--brand-text);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid var(--brand-border);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color .15s ease, color .15s ease;
+}
+.link-voltar:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+
+/* =========== TOOLBAR (seletor de eleição) =========== */
+.toolbar--top {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin-bottom: 16px;
+}
+
+/* Responsividade final: telas muito pequenas */
+@media (max-width: 420px) {
+  .kpi-value { font-size: 24px; }
+  h1 { font-size: 22px; }
+  .ballot-header__title { font-size: 22px; }
+  .card { padding: 20px 18px; }
+}
