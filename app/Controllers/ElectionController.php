@@ -590,14 +590,33 @@ final class ElectionController extends Controller
         $churchId = (int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0);
         $pdo = $this->services['pdo'];
 
-        $eStmt = $pdo->prepare(
-            "SELECT id, title, type, election_date, status, assembly_type, entity_name, church_legal_name, church_name, expected_voters
-             FROM elections WHERE id = :id AND church_id = :cid LIMIT 1"
-        );
+        $eStmt = $pdo->prepare("SELECT id, title, type, election_date, status FROM elections WHERE id = :id AND church_id = :cid LIMIT 1");
         $eStmt->execute([':id' => $id, ':cid' => $churchId]);
         $election = $eStmt->fetch(PDO::FETCH_ASSOC);
         if (!$election) {
             throw new RuntimeException('Eleição não encontrada.');
+        }
+
+        try {
+            $colStmt = $pdo->prepare(
+                "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'elections'
+                   AND COLUMN_NAME IN ('assembly_type','entity_name','church_legal_name','church_name','expected_voters')"
+            );
+            $colStmt->execute();
+            $existingCols = array_flip(array_map(static fn($r) => (string)($r['COLUMN_NAME'] ?? ''), $colStmt->fetchAll(PDO::FETCH_ASSOC) ?: []));
+
+            $extraSelect = [];
+            foreach (['assembly_type','entity_name','church_legal_name','church_name','expected_voters'] as $col) {
+                if (isset($existingCols[$col])) $extraSelect[] = $col;
+            }
+            if ($extraSelect !== []) {
+                $extraStmt = $pdo->prepare("SELECT " . implode(', ', $extraSelect) . " FROM elections WHERE id = :id AND church_id = :cid LIMIT 1");
+                $extraStmt->execute([':id' => $id, ':cid' => $churchId]);
+                $extraRow = $extraStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+                $election = array_merge($election, $extraRow);
+            }
+        } catch (\Throwable) {
         }
 
         /** @var \App\Domain\Services\AttendancePdfService $pdfSvc */
