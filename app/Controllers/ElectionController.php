@@ -590,7 +590,10 @@ final class ElectionController extends Controller
         $churchId = (int)($_SESSION[\App\Core\Auth::SESS_CHURCH_ID] ?? 0);
         $pdo = $this->services['pdo'];
 
-        $eStmt = $pdo->prepare("SELECT id, title, type, election_date, status FROM elections WHERE id = :id AND church_id = :cid LIMIT 1");
+        $eStmt = $pdo->prepare(
+            "SELECT id, title, type, election_date, status, assembly_type, entity_name, church_legal_name, church_name, expected_voters
+             FROM elections WHERE id = :id AND church_id = :cid LIMIT 1"
+        );
         $eStmt->execute([':id' => $id, ':cid' => $churchId]);
         $election = $eStmt->fetch(PDO::FETCH_ASSOC);
         if (!$election) {

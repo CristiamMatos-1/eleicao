@@ -20,6 +20,15 @@ final class AttendancePdfService
     {
         $rows = $this->fetchRows($churchId, $electionId);
 
+        $displayOrig = (bool)ini_get('display_errors');
+        ini_set('display_errors', '0');
+        error_reporting(0);
+        while (ob_get_level() > 0) {
+            if (!@ob_end_clean()) {
+                break;
+            }
+        }
+
         $pdf = new FPDF('P', 'mm', 'A4');
         $pdf->SetMargins(20, 20, 20);
         $pdf->SetAutoPageBreak(true, 20);
@@ -41,7 +50,19 @@ final class AttendancePdfService
         }
 
         $title = 'Lista_de_Presenca_' . preg_replace('/[^A-Za-z0-9_-]/', '_', (string)($election['title'] ?? 'lista')) . '.pdf';
+
+        if (!headers_sent()) {
+            header('Content-Type: application/pdf');
+            header('Content-Transfer-Encoding: binary');
+            header('Cache-Control: private, max-age=0, must-revalidate');
+            header('Pragma: public');
+            header('Content-Disposition: attachment; filename="' . $title . '"');
+            echo $pdf->Output('S');
+            exit;
+        }
+
         $pdf->Output('D', $title, true);
+        exit;
     }
 
     private function fetchEntityName(array $election, int $churchId): string

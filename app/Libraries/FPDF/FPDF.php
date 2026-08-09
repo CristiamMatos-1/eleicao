@@ -565,7 +565,7 @@ final class FPDF
         $this->n        = 0;
         $this->offsets  = [];
         $this->buffer   = "%PDF-1.4\n";
-        $this->buffer  .= "%âãÏÓ\n";
+        $this->buffer  .= "%" . chr(226) . chr(227) . chr(207) . chr(211) . "\n";
 
         $objectPages      = $this->_newobj();
         $objectCatalog    = $this->_newobj();
